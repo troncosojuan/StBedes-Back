@@ -1,0 +1,59 @@
+[
+  {
+    "question_type_id": 1,
+    "options": [
+      "Agree",
+      "Not sure",
+      "Disagree"
+    ],
+    "type": "select"
+  },
+  {
+    "question_type_id": 2,
+    "options": [
+      "I do not feel safe",
+      "I sometimes feel safe",
+      "I feel safe",
+      "Don't know"
+    ],
+    "type": "select"
+  },
+  {
+    "question_type_id": 3,
+    "options": [
+      "Strongly agree",
+      "Agree",
+      "Disagree",
+      "Strongly disagree",
+      "Not applicable"
+    ],
+    "type": "select"
+  },
+  {
+    "question_type_id": 4,
+    "options": "",
+    "type": "text"
+  },
+  {
+    "question_type_id": 5,
+    "options": [
+      "Never any wasted time",
+      "Occasionally there is wasted time"
+    ],
+    "type": "select"
+  },
+  {
+    "question_type_id": 6,
+    "options": [
+      "Yes",
+      "No",
+      "Prefer not to say"
+    ],
+    "type": "select"
+  },
+  {
+    "question_type_id": 7,
+    "options": "",
+    "type": "select"
+  }
+]

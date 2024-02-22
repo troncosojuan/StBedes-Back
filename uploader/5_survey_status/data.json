@@ -1,0 +1,17 @@
+[
+  {
+    "survey": "parent",
+    "section": "all",
+    "is_open": false
+  },
+  {
+    "survey": "student",
+    "section": "school",
+    "is_open": false
+  },
+  {
+    "survey": "student",
+    "section": "academic",
+    "is_open": true
+  }
+]

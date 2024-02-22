@@ -1,0 +1,1010 @@
+[
+  {
+    "subject_id": 1,
+    "subject_name": "Art",
+    "department_id": 1,
+    "last_update_api_date": "2021-06-29 16:31:51+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 8,
+    "subject_name": "Design & Technology",
+    "department_id": 1,
+    "last_update_api_date": "2023-07-03 13:56:47+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 25,
+    "subject_name": "Photography",
+    "department_id": 1,
+    "last_update_api_date": "2023-07-04 09:37:23+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 82,
+    "subject_name": "Art Award",
+    "department_id": 1,
+    "last_update_api_date": "2022-09-26 21:42:30+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 89,
+    "subject_name": "Design & Technology for Reporting",
+    "department_id": 1,
+    "last_update_api_date": "2022-10-05 15:35:24+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 94,
+    "subject_name": "Art 10 week",
+    "department_id": 1,
+    "last_update_api_date": "2023-11-15 10:15:44+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 95,
+    "subject_name": "Design 10 Week",
+    "department_id": 1,
+    "last_update_api_date": "2023-11-15 10:15:59+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 119,
+    "subject_name": "Photography 10 Week",
+    "department_id": 1,
+    "last_update_api_date": "2023-11-15 10:16:06+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 2,
+    "subject_name": "Biology",
+    "department_id": 5,
+    "last_update_api_date": "2023-07-04 09:29:15+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 4,
+    "subject_name": "Chemistry",
+    "department_id": 5,
+    "last_update_api_date": "2023-07-04 09:29:43+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 26,
+    "subject_name": "Physics",
+    "department_id": 5,
+    "last_update_api_date": "2023-07-04 09:37:37+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 30,
+    "subject_name": "Science",
+    "department_id": 5,
+    "last_update_api_date": "2023-07-04 09:39:03+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 31,
+    "subject_name": "Science Trilogy",
+    "department_id": 5,
+    "last_update_api_date": "2023-07-04 09:38:49+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 58,
+    "subject_name": "Science Trilogy for Reporting",
+    "department_id": 5,
+    "last_update_api_date": "2021-11-18 13:30:25+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 83,
+    "subject_name": "Biology for Reporting",
+    "department_id": 5,
+    "last_update_api_date": "2022-09-30 16:21:41+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 84,
+    "subject_name": "Chemistry for Reporting",
+    "department_id": 5,
+    "last_update_api_date": "2022-09-30 16:23:10+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 85,
+    "subject_name": "Physics for Reporting",
+    "department_id": 5,
+    "last_update_api_date": "2022-09-30 16:23:23+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 98,
+    "subject_name": "Biology 10 Week",
+    "department_id": 5,
+    "last_update_api_date": "2023-11-15 10:30:29+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 99,
+    "subject_name": "Chemistry 10 Week",
+    "department_id": 5,
+    "last_update_api_date": "2023-11-15 10:30:37+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 100,
+    "subject_name": "Physics 10 Week",
+    "department_id": 5,
+    "last_update_api_date": "2023-11-15 10:31:22+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 123,
+    "subject_name": "Science 10 Week",
+    "department_id": 5,
+    "last_update_api_date": "2023-11-15 10:31:33+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 143,
+    "subject_name": "Science for Reporting",
+    "department_id": 5,
+    "last_update_api_date": "2023-12-06 15:43:19+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 3,
+    "subject_name": "Business",
+    "department_id": 6,
+    "last_update_api_date": "2023-07-04 09:29:26+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 10,
+    "subject_name": "Economics",
+    "department_id": 6,
+    "last_update_api_date": "2023-07-04 09:31:11+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 28,
+    "subject_name": "Psychology",
+    "department_id": 6,
+    "last_update_api_date": "2023-07-04 09:37:59+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 49,
+    "subject_name": "Business for Reporting",
+    "department_id": 6,
+    "last_update_api_date": "2021-11-18 11:26:51+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 50,
+    "subject_name": "Economics for Reporting",
+    "department_id": 6,
+    "last_update_api_date": "2021-11-18 11:30:28+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 86,
+    "subject_name": "Psychology for Reporting",
+    "department_id": 6,
+    "last_update_api_date": "2022-10-05 11:45:45+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 96,
+    "subject_name": "Business 10 Week",
+    "department_id": 6,
+    "last_update_api_date": "2023-11-15 10:20:02+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 102,
+    "subject_name": "Economics 10 Week",
+    "department_id": 6,
+    "last_update_api_date": "2023-11-15 10:20:10+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 122,
+    "subject_name": "Psychology 10 Week",
+    "department_id": 6,
+    "last_update_api_date": "2023-11-15 10:20:18+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 6,
+    "subject_name": "Computing",
+    "department_id": 7,
+    "last_update_api_date": "2023-07-04 09:30:21+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 97,
+    "subject_name": "Computing 10 Week",
+    "department_id": 7,
+    "last_update_api_date": "2023-11-15 10:20:28+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 11,
+    "subject_name": "English",
+    "department_id": 8,
+    "last_update_api_date": "2023-07-04 09:32:11+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 12,
+    "subject_name": "English Language",
+    "department_id": 8,
+    "last_update_api_date": "2023-07-04 09:31:49+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 13,
+    "subject_name": "English Literature",
+    "department_id": 8,
+    "last_update_api_date": "2023-07-04 09:32:03+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 48,
+    "subject_name": "English for Reporting",
+    "department_id": 8,
+    "last_update_api_date": "2021-11-12 12:29:14+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 78,
+    "subject_name": "Y12 GCSE English reporting",
+    "department_id": 8,
+    "last_update_api_date": "2022-04-26 09:48:05+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 87,
+    "subject_name": "English Literature for Reporting",
+    "department_id": 8,
+    "last_update_api_date": "2022-10-05 12:55:30+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 88,
+    "subject_name": "English Language for Reporting",
+    "department_id": 8,
+    "last_update_api_date": "2022-10-05 15:31:47+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 103,
+    "subject_name": "English 10 Week",
+    "department_id": 8,
+    "last_update_api_date": "2023-11-15 10:20:43+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 104,
+    "subject_name": "English Language 10 Week",
+    "department_id": 8,
+    "last_update_api_date": "2023-11-15 10:20:55+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 109,
+    "subject_name": "English Literature 10 Week",
+    "department_id": 8,
+    "last_update_api_date": "2023-11-15 10:25:12+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 17,
+    "subject_name": "Geography",
+    "department_id": 9,
+    "last_update_api_date": "2023-07-04 09:32:38+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 51,
+    "subject_name": "Geography for Reporting",
+    "department_id": 9,
+    "last_update_api_date": "2021-11-18 11:35:17+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 108,
+    "subject_name": "Geography 10 week",
+    "department_id": 9,
+    "last_update_api_date": "2023-11-15 10:25:27+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 5,
+    "subject_name": "Classical Civilisation",
+    "department_id": 10,
+    "last_update_api_date": "2023-07-04 09:30:06+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 20,
+    "subject_name": "History",
+    "department_id": 10,
+    "last_update_api_date": "2023-07-04 09:33:18+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 21,
+    "subject_name": "Latin",
+    "department_id": 10,
+    "last_update_api_date": "2023-07-04 09:35:39+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 27,
+    "subject_name": "Politics",
+    "department_id": 10,
+    "last_update_api_date": "2021-06-29 16:31:51+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 52,
+    "subject_name": "History for Reporting",
+    "department_id": 10,
+    "last_update_api_date": "2021-11-18 11:46:09+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 53,
+    "subject_name": "Politics for Reporting",
+    "department_id": 10,
+    "last_update_api_date": "2021-11-18 12:45:40+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 110,
+    "subject_name": "History 10 Week",
+    "department_id": 10,
+    "last_update_api_date": "2023-11-15 10:25:56+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 111,
+    "subject_name": "Classics 10 Week",
+    "department_id": 10,
+    "last_update_api_date": "2023-11-15 10:25:47+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 112,
+    "subject_name": "Politics 10 Week",
+    "department_id": 10,
+    "last_update_api_date": "2023-11-15 10:26:18+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 113,
+    "subject_name": "Latin 10 Week",
+    "department_id": 10,
+    "last_update_api_date": "2023-11-15 10:26:09+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 15,
+    "subject_name": "Further Mathematics",
+    "department_id": 11,
+    "last_update_api_date": "2022-10-23 10:53:41+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 22,
+    "subject_name": "Mathematics",
+    "department_id": 11,
+    "last_update_api_date": "2023-07-04 09:36:06+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 47,
+    "subject_name": "Maths for Reporting",
+    "department_id": 11,
+    "last_update_api_date": "2021-11-12 11:47:15+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 93,
+    "subject_name": "Maths 10 Week",
+    "department_id": 11,
+    "last_update_api_date": "2023-11-15 10:27:02+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 124,
+    "subject_name": "Further Maths 10 Week",
+    "department_id": 11,
+    "last_update_api_date": "2023-11-15 10:26:30+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 135,
+    "subject_name": "Further Maths for Reporting",
+    "department_id": 11,
+    "last_update_api_date": "2023-10-03 15:52:34+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 14,
+    "subject_name": "French",
+    "department_id": 12,
+    "last_update_api_date": "2023-07-04 09:32:27+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 19,
+    "subject_name": "German",
+    "department_id": 12,
+    "last_update_api_date": "2023-07-19 10:39:45+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 32,
+    "subject_name": "Spanish",
+    "department_id": 12,
+    "last_update_api_date": "2023-07-04 09:39:32+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 54,
+    "subject_name": "French for Reporting",
+    "department_id": 12,
+    "last_update_api_date": "2021-11-18 12:50:45+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 114,
+    "subject_name": "French 10 Week",
+    "department_id": 12,
+    "last_update_api_date": "2023-11-15 10:28:13+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 115,
+    "subject_name": "Spanish 10 Week",
+    "department_id": 12,
+    "last_update_api_date": "2023-11-15 10:28:33+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 116,
+    "subject_name": "German 10 Week",
+    "department_id": 12,
+    "last_update_api_date": "2023-11-15 10:28:22+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 136,
+    "subject_name": "German for Reporting",
+    "department_id": 12,
+    "last_update_api_date": "2023-10-03 16:25:26+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 137,
+    "subject_name": "Spanish for Reporting",
+    "department_id": 12,
+    "last_update_api_date": "2023-10-03 16:27:49+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 140,
+    "subject_name": "Speaking Practice",
+    "department_id": 12,
+    "last_update_api_date": "2023-11-07 15:45:48+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 29,
+    "subject_name": "Religion",
+    "department_id": 13,
+    "last_update_api_date": "2023-07-04 09:38:12+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 34,
+    "subject_name": "Theology",
+    "department_id": 13,
+    "last_update_api_date": "2021-06-29 16:31:51+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 57,
+    "subject_name": "Theology for Reporting",
+    "department_id": 13,
+    "last_update_api_date": "2021-11-18 13:13:25+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 117,
+    "subject_name": "Religion 10 Week",
+    "department_id": 13,
+    "last_update_api_date": "2023-11-15 10:30:05+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 120,
+    "subject_name": "Theology 10 Week",
+    "department_id": 13,
+    "last_update_api_date": "2023-11-15 10:30:17+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 144,
+    "subject_name": "Religion for Reporting",
+    "department_id": 13,
+    "last_update_api_date": "2023-12-06 16:17:53+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 7,
+    "subject_name": "Dance",
+    "department_id": 14,
+    "last_update_api_date": "2023-07-04 09:30:43+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 9,
+    "subject_name": "Drama & Theatre",
+    "department_id": 14,
+    "last_update_api_date": "2023-07-04 09:30:57+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 23,
+    "subject_name": "Music",
+    "department_id": 14,
+    "last_update_api_date": "2023-07-04 09:36:18+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 39,
+    "subject_name": "Theatre Studies",
+    "department_id": 14,
+    "last_update_api_date": "2022-10-10 13:45:36+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 55,
+    "subject_name": "BTEC Performing Arts for Reporting",
+    "department_id": 14,
+    "last_update_api_date": "2021-11-18 13:06:50+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 56,
+    "subject_name": "Dance for Reporting",
+    "department_id": 14,
+    "last_update_api_date": "2021-11-18 13:10:25+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 105,
+    "subject_name": "Drama 10 Week",
+    "department_id": 14,
+    "last_update_api_date": "2023-11-15 10:29:21+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 106,
+    "subject_name": "Dance 10 Week",
+    "department_id": 14,
+    "last_update_api_date": "2023-11-15 10:29:05+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 107,
+    "subject_name": "Music 10 Week",
+    "department_id": 14,
+    "last_update_api_date": "2023-11-15 10:29:31+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 121,
+    "subject_name": "Theatre Studies 10 Week",
+    "department_id": 14,
+    "last_update_api_date": "2023-11-15 10:29:50+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 16,
+    "subject_name": "Games",
+    "department_id": 15,
+    "last_update_api_date": "2023-07-03 14:08:55+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 24,
+    "subject_name": "Physical Education",
+    "department_id": 15,
+    "last_update_api_date": "2023-07-04 09:36:38+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 118,
+    "subject_name": "PE 10 Week",
+    "department_id": 15,
+    "last_update_api_date": "2023-11-15 10:31:50+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 138,
+    "subject_name": "PE for Reporting",
+    "department_id": 15,
+    "last_update_api_date": "2023-10-03 16:34:15+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 35,
+    "subject_name": "PSMEE",
+    "department_id": 16,
+    "last_update_api_date": "2023-07-04 09:36:58+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 36,
+    "subject_name": "Study",
+    "department_id": 16,
+    "last_update_api_date": "2021-07-06 10:22:13+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 37,
+    "subject_name": "Literacy",
+    "department_id": 16,
+    "last_update_api_date": "2023-07-03 14:12:22+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 38,
+    "subject_name": "Tutor Time",
+    "department_id": 16,
+    "last_update_api_date": "2021-07-06 10:21:42+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 40,
+    "subject_name": "EAL",
+    "department_id": 16,
+    "last_update_api_date": "2023-09-19 11:55:39+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 42,
+    "subject_name": "SEND Support",
+    "department_id": 16,
+    "last_update_api_date": "2021-08-25 10:35:38+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 45,
+    "subject_name": "Achievement Centre",
+    "department_id": 16,
+    "last_update_api_date": "2021-09-10 13:03:40+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 73,
+    "subject_name": "One off booking",
+    "department_id": 16,
+    "last_update_api_date": "2022-01-21 09:37:54+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 90,
+    "subject_name": "CFA Acceleration",
+    "department_id": 16,
+    "last_update_api_date": "2023-09-21 09:42:15+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 126,
+    "subject_name": "Sixth Form PM Registration",
+    "department_id": 16,
+    "last_update_api_date": "2023-09-20 09:31:49+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 139,
+    "subject_name": "PSMEE 10 Week",
+    "department_id": 16,
+    "last_update_api_date": "2023-11-15 10:28:48+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 41,
+    "subject_name": "Non Class",
+    "department_id": 17,
+    "last_update_api_date": "2021-08-25 09:52:26+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 46,
+    "subject_name": "Exams",
+    "department_id": 17,
+    "last_update_api_date": "2021-10-18 16:08:53+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 74,
+    "subject_name": "Chaplaincy",
+    "department_id": 17,
+    "last_update_api_date": "2022-01-31 09:45:28+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 75,
+    "subject_name": "EPQ",
+    "department_id": 17,
+    "last_update_api_date": "2022-03-15 11:29:32+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 92,
+    "subject_name": "English Library Lessons",
+    "department_id": 17,
+    "last_update_api_date": "2022-11-07 15:50:15+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 125,
+    "subject_name": "Teaching Group",
+    "department_id": 17,
+    "last_update_api_date": "2023-09-19 11:16:45+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 141,
+    "subject_name": "CFA (Training)",
+    "department_id": 17,
+    "last_update_api_date": "2023-11-28 10:24:32+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 142,
+    "subject_name": "Bedian Research Program",
+    "department_id": 17,
+    "last_update_api_date": "2023-11-28 14:27:25+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 145,
+    "subject_name": "Co-Teaching",
+    "department_id": 17,
+    "last_update_api_date": "2023-12-08 15:14:02+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 44,
+    "subject_name": "Prep",
+    "department_id": 18,
+    "last_update_api_date": "2021-09-06 14:12:03+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 59,
+    "subject_name": "Prep English",
+    "department_id": 18,
+    "last_update_api_date": "2022-01-04 09:57:21+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 60,
+    "subject_name": "Prep Maths",
+    "department_id": 18,
+    "last_update_api_date": "2022-01-04 10:16:10+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 61,
+    "subject_name": "Prep Science",
+    "department_id": 18,
+    "last_update_api_date": "2022-01-04 10:45:57+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 62,
+    "subject_name": "Prep BTK",
+    "department_id": 18,
+    "last_update_api_date": "2022-01-04 11:09:46+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 63,
+    "subject_name": "Prep Physical Education",
+    "department_id": 18,
+    "last_update_api_date": "2022-01-04 11:13:00+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 64,
+    "subject_name": "Prep Art",
+    "department_id": 18,
+    "last_update_api_date": "2022-01-04 11:13:23+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 65,
+    "subject_name": "Prep Technola",
+    "department_id": 18,
+    "last_update_api_date": "2022-05-04 14:05:35+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 66,
+    "subject_name": "Prep Music",
+    "department_id": 18,
+    "last_update_api_date": "2022-01-04 11:25:18+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 67,
+    "subject_name": "Prep MFL",
+    "department_id": 18,
+    "last_update_api_date": "2022-05-04 14:02:55+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 68,
+    "subject_name": "Prep Humanities",
+    "department_id": 18,
+    "last_update_api_date": "2022-01-04 11:30:02+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 69,
+    "subject_name": "Prep Computing",
+    "department_id": 18,
+    "last_update_api_date": "2022-01-04 11:35:11+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 70,
+    "subject_name": "Prep Topic",
+    "department_id": 18,
+    "last_update_api_date": "2022-01-04 11:36:07+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 71,
+    "subject_name": "Prep Design Technology",
+    "department_id": 18,
+    "last_update_api_date": "2022-05-04 15:14:47+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 72,
+    "subject_name": "Prep Drama",
+    "department_id": 18,
+    "last_update_api_date": "2022-01-04 11:46:34+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 76,
+    "subject_name": "Prep Reception",
+    "department_id": 18,
+    "last_update_api_date": "2022-03-18 12:02:34+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 77,
+    "subject_name": "Prep Nursery",
+    "department_id": 18,
+    "last_update_api_date": "2022-03-22 11:53:21+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 127,
+    "subject_name": "Prep Assembly",
+    "department_id": 18,
+    "last_update_api_date": "2023-09-26 14:22:50+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 128,
+    "subject_name": "Prep Library",
+    "department_id": 18,
+    "last_update_api_date": "2023-09-26 14:26:51+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 129,
+    "subject_name": "Prep KS2 Hymns",
+    "department_id": 18,
+    "last_update_api_date": "2023-09-26 15:44:44+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 130,
+    "subject_name": "Prep Spelling",
+    "department_id": 18,
+    "last_update_api_date": "2023-09-26 15:57:20+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 131,
+    "subject_name": "Prep PSHEE & RSE",
+    "department_id": 18,
+    "last_update_api_date": "2023-09-26 16:27:05+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 132,
+    "subject_name": "Prep Homework",
+    "department_id": 18,
+    "last_update_api_date": "2023-09-27 09:54:13+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 133,
+    "subject_name": "Prep Virtue",
+    "department_id": 18,
+    "last_update_api_date": "2023-09-27 09:54:32+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 134,
+    "subject_name": "Prep Eucharistic Preparation",
+    "department_id": 18,
+    "last_update_api_date": "2023-09-27 13:55:30+00",
+    "is_included": false
+  },
+  {
+    "subject_id": 147,
+    "subject_name": "ST Chemistry",
+    "department_id": 5,
+    "last_update_api_date": "2024-01-19 10:39:27+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 148,
+    "subject_name": "ST Physics",
+    "department_id": 5,
+    "last_update_api_date": "2024-01-19 10:40:08+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 146,
+    "subject_name": "Latin for Reporting",
+    "department_id": 10,
+    "last_update_api_date": "2024-01-16 11:19:55+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 149,
+    "subject_name": "Computing for Reporting",
+    "department_id": 7,
+    "last_update_api_date": "2024-01-25 11:46:45+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 150,
+    "subject_name": "Art for Reporting",
+    "department_id": 1,
+    "last_update_api_date": "2024-01-25 14:07:16+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 151,
+    "subject_name": "Drama for Reporting",
+    "department_id": 14,
+    "last_update_api_date": "2024-01-25 15:06:15+00",
+    "is_included": true
+  },
+  {
+    "subject_id": 152,
+    "subject_name": "Revision Acceleration",
+    "department_id": 16,
+    "last_update_api_date": "2024-01-26 15:02:02+00",
+    "is_included": true
+  }
+]
