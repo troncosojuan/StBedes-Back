@@ -1,15 +1,13 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { QuestionService } from './question.service';
 
 @Controller('question')
 export class QuestionController {
-    constructor(private readonly prisma: PrismaService = new PrismaService()) {}
-    async getActiveQuestions(studentId : any): Promise<any> {
-        const questions = await this.prisma.active_question_student.findMany({
-            where: {
-                student_id: studentId 
-            }
-        })
-        return questions;
+    constructor(private readonly questionService: QuestionService = new QuestionService()) {}
+    @Get("activeQuestions/:studentId")
+    async getActiveQuestions(@Param("studentId") studentId: string): Promise<any> {
+        return await this.questionService.getActiveQuestions(studentId);
     }
+    
 }
