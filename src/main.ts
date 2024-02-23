@@ -1,6 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { ConsoleLogger, Logger, ValidationPipe, VersioningType } from '@nestjs/common';
+import {  ValidationPipe, VersioningType } from '@nestjs/common';
 import { AppModuleV1 } from './app.module';
 
 async function bootstrap() {
