@@ -23,7 +23,7 @@ export class SurveyController {
         return this.surveyService.getSurveyTeacherQuestionsBySurveyTeacherId(id);
     }
 
-    @Post("add-teacher_answer")
+    @Post("add-teacher-answer")
     async createTeacherAnswer(@Body() data: any) {
         return this.surveyService.createTeacherAnswer(data);
     }
