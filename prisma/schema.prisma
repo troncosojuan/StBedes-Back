@@ -8,8 +8,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model user {
+  id        Int       @id @default(autoincrement())
+  name      String?
+  email     String    @unique
+  password  String
+  createdAt DateTime  @default(now())
+}
+
 model question {
-  question_id             Int                       @id @default(autoincrement())
+  question_id             Int                       @id 
   section                 String?
   title                   String?
   content                 String?
@@ -21,16 +29,16 @@ model question {
   survey_teacher_question survey_teacher_question[]
 }
 
-model question_type {
-  question_type_id Int        @id @default(autoincrement())
-  options          Json?
-  type             String?
-  created_at       DateTime?  @default(now()) @db.Timestamptz
-  question         question[]
-}
+  model question_type {
+    question_type_id Int        @id 
+    options          Json?
+    type             String?
+    created_at       DateTime?  @default(now()) @db.Timestamptz
+    question         question[]
+  }
 
 model set {
-  set_id               Int              @id @default(autoincrement())
+  set_id               Int              @id 
   subject_id           Int?
   year_id              Int?
   set_code             String?
@@ -45,7 +53,7 @@ model set {
 }
 
 model set_list {
-  set_list_id          Int       @id @default(autoincrement())
+  set_list_id          Int       @id 
   set_id               Int?
   student_id           Int?
   last_update_api_date DateTime? @db.Timestamptz
@@ -55,7 +63,7 @@ model set_list {
 }
 
 model student {
-  student_id                     Int                              @id @default(autoincrement())
+  student_id                     Int                              @id 
   person_id                      Int?
   family_id                      Int?
   title                          String?
@@ -76,11 +84,12 @@ model student {
   set_list                       set_list[]
   student_by_year                student_by_year[]
   survey_teacher_question_answer survey_teacher_question_answer[]
-  survey_by_teacher              survey_by_teacher[]
+  student_has_survey_teacher     student_has_survey_teacher[]
+  student_has_survey             student_has_survey[]
 }
 
 model student_by_year {
-  id         Int        @id @default(autoincrement())
+  id         Int        @id 
   student_id Int
   year_id    Int
   created_at DateTime?  @default(now()) @db.Timestamptz
@@ -89,7 +98,7 @@ model student_by_year {
 }
 
 model subject {
-  subject_id    Int        @id @default(autoincrement())
+  subject_id    Int        @id 
   subject_name  String?
   is_included   Boolean?
   department_id Int
@@ -99,7 +108,7 @@ model subject {
 }
 
 model department {
-  department_id        Int       @id @default(autoincrement())
+  department_id        Int       @id 
   department_name      String
   created_at           DateTime? @default(now()) @db.Timestamptz
   last_update_api_date DateTime? @db.Timestamptz
@@ -107,7 +116,7 @@ model department {
 }
 
 model teacher {
-  staff_id             Int              @id @default(autoincrement())
+  staff_id             Int              @id 
   person_id            Int?
   title                String?
   forename             String?
@@ -143,10 +152,11 @@ model year_group {
 }
 
 model survey {
-  survey_id       Int               @id @default(autoincrement())
-  date            DateTime?
-  created_at      DateTime?         @default(now()) @db.Timestamptz
-  survey_question survey_question[]
+  survey_id          Int                  @id @default(autoincrement())
+  date               DateTime?
+  created_at         DateTime?            @default(now()) @db.Timestamptz
+  survey_question    survey_question[]
+  student_has_survey student_has_survey[]
 }
 
 model survey_status {
@@ -172,26 +182,26 @@ model survey_question_answer {
   survey_question_id Int
   student_id         Int
   answer             String?
-  answer_date        DateTime?
   created_at         DateTime?       @default(now()) @db.Timestamptz
   survey_question    survey_question @relation(fields: [survey_question_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "survey_question_answer_survey_question_fk")
 }
 
 model survey_teacher {
-  survey_teacher_id       Int                       @id @default(autoincrement())
-  teacher_id              Int
-  set_id                  Int
-  created_at              DateTime?                 @default(now()) @db.Timestamptz
-  set                     set                       @relation(fields: [set_id], references: [set_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_teacher_set_fk")
-  teacher                 teacher                   @relation(fields: [teacher_id], references: [staff_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_teacher_teacher_fk")
-  survey_teacher_question survey_teacher_question[]
-  survey_by_teacher       survey_by_teacher[]
+  survey_teacher_id          Int                          @id @default(autoincrement())
+  teacher_id                 Int
+  set_id                     Int
+  created_at                 DateTime?                    @default(now()) @db.Timestamptz
+  set                        set                          @relation(fields: [set_id], references: [set_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_teacher_set_fk")
+  teacher                    teacher                      @relation(fields: [teacher_id], references: [staff_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_teacher_teacher_fk")
+  survey_teacher_question    survey_teacher_question[]
+  student_has_survey_teacher student_has_survey_teacher[]
 }
 
 model survey_teacher_question {
   survey_teacher_question_id     Int                              @id @default(autoincrement())
   survey_teacher_id              Int
   question_id                    Int
+  is_included                    Boolean?                         @default(true)
   created_at                     DateTime?                        @default(now()) @db.Timestamptz
   survey_teacher                 survey_teacher                   @relation(fields: [survey_teacher_id], references: [survey_teacher_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_teacher_question_survey_teacher_fk")
   question                       question                         @relation(fields: [question_id], references: [question_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_teacher_question_question_fk")
@@ -203,13 +213,12 @@ model survey_teacher_question_answer {
   survey_teacher_question_id Int
   student_id                 Int
   answer                     String?
-  answer_date                DateTime?
   created_at                 DateTime?               @default(now()) @db.Timestamptz
   survey_teacher_question    survey_teacher_question @relation(fields: [survey_teacher_question_id], references: [survey_teacher_question_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_teacher_question_answer_survey_teacher_question_fk")
   student                    student                 @relation(fields: [student_id], references: [student_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_teacher_question_answer_student_fk")
 }
 
-model survey_by_teacher {
+model student_has_survey_teacher {
   id                Int            @id @default(autoincrement())
   survey_teacher_id Int
   student_id        Int
@@ -217,4 +226,14 @@ model survey_by_teacher {
   created_at        DateTime?      @default(now()) @db.Timestamptz
   survey_teacher    survey_teacher @relation(fields: [survey_teacher_id], references: [survey_teacher_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_by_teacher_survey_teacher_fk")
   student           student        @relation(fields: [student_id], references: [student_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_by_teacher_student_fk")
+}
+
+model student_has_survey {
+  id          Int       @id @default(autoincrement())
+  survey_id   Int
+  student_id  Int
+  is_answered Boolean
+  created_at  DateTime? @default(now()) @db.Timestamptz
+  survey      survey    @relation(fields: [survey_id], references: [survey_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_by_teacher_survey_teacher_fk")
+  student     student   @relation(fields: [student_id], references: [student_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_by_teacher_student_fk")
 }
