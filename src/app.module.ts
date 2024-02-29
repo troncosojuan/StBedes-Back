@@ -1,4 +1,4 @@
-import {  Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { PrismaService } from './prisma/prisma.service';
 import { TeacherModule } from './teacher/teacher.module';
 import { SurveyModule } from './survey/survey.module';
@@ -12,7 +12,7 @@ import { SetModule } from './set/set.module';
 import { SetlistModule } from './setlist/setlist.module';
 import { YearGroupModule } from './year_group/year_group.module';
 import { QuestionTypeModule } from './question_type/question_type.module';
-import { BorrarModule } from './borrar/borrar.module';
+
 
 
 @Module({
@@ -29,7 +29,7 @@ import { BorrarModule } from './borrar/borrar.module';
     SetlistModule,
     YearGroupModule,
     QuestionTypeModule,
-    BorrarModule],
+  ],
   providers: [
     PrismaService,
   ],

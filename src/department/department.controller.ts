@@ -7,19 +7,19 @@ import { CreatDepartmentDto } from './dto/creatDepartment.dto';
 @ApiTags('department')
 @Controller('department')
 export class DepartmentController {
-  constructor(private readonly departmentService: DepartmentService) {}
+  constructor(private readonly departmentService: DepartmentService) { }
 
   @Post('createMany')
   @ApiResponse({ status: 201, description: "Departments created successfully" })
   async createMany(@Body() createDepartmentDto: CreatDepartmentDto[]) {
-      await this.departmentService.createMany(createDepartmentDto);
+    await this.departmentService.createMany(createDepartmentDto);
   }
 
   @Post('create')
   @ApiResponse({ status: 201, description: "Department created successfully" })
   async create(@Body() createStudentDto: CreatDepartmentDto) {
-      await this.departmentService.create(createStudentDto);
+    await this.departmentService.create(createStudentDto);
   }
-  
+
 
 }
