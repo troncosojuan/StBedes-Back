@@ -53,12 +53,4 @@ export class CreateStudentDto {
     @ApiProperty()
     @IsString()
     password: string;
-
-    //   set_list: SetListDto[];
-    //   student_by_year: StudentByYearDto[];
-    //   survey_teacher_question_answer: SurveyTeacherQuestionAnswerDto[];
-    //   student_has_survey_teacher: StudentHasSurveyTeacherDto[];
-    //   student_has_survey: StudentHasSurveyDto[];
-
-
 }

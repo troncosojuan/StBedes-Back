@@ -1,9 +1,9 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { SetService } from './set.service';
-import { ApiResponse } from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateSetDto } from './dto/createSet.dto';
 
-
+@ApiTags('set')
 @Controller('set')
 export class SetController {
   constructor(private readonly setService: SetService) {}

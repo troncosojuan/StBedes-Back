@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNumber } from "class-validator";
+import { IsDate, IsNumber } from "class-validator";
 
 export class CreateSetlistDto {
     @ApiProperty()
@@ -11,4 +11,7 @@ export class CreateSetlistDto {
     @ApiProperty()
     @IsNumber()
     student_id: number;
+    @ApiProperty()
+    @IsDate()
+    last_update_api_date: Date;
 }

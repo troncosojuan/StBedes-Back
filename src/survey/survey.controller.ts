@@ -1,6 +1,8 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { SurveyService } from './survey.service';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('survey')
 @Controller('survey')
 export class SurveyController {
     constructor(private readonly surveyService: SurveyService) {}

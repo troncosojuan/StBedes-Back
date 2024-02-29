@@ -1,9 +1,10 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { YearGroupService } from './year_group.service';
-import { ApiResponse } from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateYearGroupDto } from './dto/createYearGroup.dto';
 
 
+@ApiTags('year-group')
 @Controller('year-group')
 export class YearGroupController {
   constructor(private readonly yearGroupService: YearGroupService) {}

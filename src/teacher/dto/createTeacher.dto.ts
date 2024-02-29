@@ -5,9 +5,6 @@ export class CreateTeacherDto {
     
     @ApiProperty()
     @IsNumber()
-    teacher_id: number;
-    @ApiProperty()
-    @IsNumber()
     staff_id: number;
     @ApiProperty()
     @IsNumber()

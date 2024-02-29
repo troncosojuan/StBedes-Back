@@ -110,8 +110,8 @@ model subject {
 model department {
   department_id        Int       @id 
   department_name      String
-  created_at           DateTime? @default(now()) @db.Timestamptz
   last_update_api_date DateTime? @db.Timestamptz
+  created_at           DateTime? @default(now()) @db.Timestamptz
   subject              subject[]
 }
 

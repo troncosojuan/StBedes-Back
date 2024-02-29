@@ -1,9 +1,9 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { SetlistService } from './setlist.service';
-import { ApiResponse } from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateSetlistDto } from './dto/createSetlist.dto';
 
-
+@ApiTags('setlist')
 @Controller('setlist')
 export class SetlistController {
   constructor(private readonly setlistService: SetlistService) { }

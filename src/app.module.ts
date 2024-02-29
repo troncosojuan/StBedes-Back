@@ -12,6 +12,7 @@ import { SetModule } from './set/set.module';
 import { SetlistModule } from './setlist/setlist.module';
 import { YearGroupModule } from './year_group/year_group.module';
 import { QuestionTypeModule } from './question_type/question_type.module';
+import { BorrarModule } from './borrar/borrar.module';
 
 
 @Module({
@@ -27,7 +28,8 @@ import { QuestionTypeModule } from './question_type/question_type.module';
     SetModule,
     SetlistModule,
     YearGroupModule,
-    QuestionTypeModule],
+    QuestionTypeModule,
+    BorrarModule],
   providers: [
     PrismaService,
   ],
