@@ -9,5 +9,6 @@ export class CreatDepartmentDto {
     @IsString()
     department_name: string;
     @ApiProperty()
-    last_update_api_date: Date;
+    @IsString()
+    last_update_api_date: string;
 }

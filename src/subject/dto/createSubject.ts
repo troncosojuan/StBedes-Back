@@ -14,4 +14,7 @@ export class CreateSubjectDto {
     @ApiProperty()
     @IsNumber()
     department_id: number;
+    @ApiProperty()
+    @IsString()
+    last_update_api_date: string;
 }

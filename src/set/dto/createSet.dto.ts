@@ -17,4 +17,7 @@ export class CreateSetDto {
     @ApiProperty()
     @IsBoolean()
     is_included: boolean;
+    @ApiProperty()
+    @IsString()
+    last_update_api_date: string;
 }
