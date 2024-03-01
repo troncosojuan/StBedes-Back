@@ -1,8 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { CreateSurveyTeacherDto } from './dto/createSurvey.dto';
 
 @Injectable()
 export class SurveyService {
+    
 
     constructor(private readonly prisma: PrismaService) { }
 
@@ -93,5 +95,12 @@ export class SurveyService {
         if (!survey) {
             throw new NotFoundException(`Survey with ID ${id} not found`);
         }
+    }
+
+    async createSurveyTeacher(data: CreateSurveyTeacherDto[]) {
+        const survey = await this.prisma.survey_teacher.createMany({
+            data: data
+        });
+            
     }
 }
