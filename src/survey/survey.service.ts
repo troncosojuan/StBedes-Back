@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateSurveyTeacherDto } from './dto/createSurvey.dto';
+import { CreateSurveyAnswerDto, CreateSurveyTeacherAnswerDto, CreateSurveyTeacherDto } from './dto/createSurvey.dto';
 
 @Injectable()
 export class SurveyService {
-    
+
 
     constructor(private readonly prisma: PrismaService) { }
 
@@ -55,23 +55,15 @@ export class SurveyService {
         // Retornar las preguntas asociadas a la encuesta
         return surveyQuestions;
     }
-    async createAnswer(data: any) {
-        const answer = await this.prisma.survey_question_answer.create({
-            data: {
-                survey_question_id: data.survey_question_id,
-                student_id: data.student_id,
-                answer: data.answer
-            }
+    async createAnswer(data: CreateSurveyAnswerDto[]) {
+        const answer = await this.prisma.survey_question_answer.createMany({
+            data: data
         });
 
     }
-    async createTeacherAnswer(data: any) {
-        const answer = await this.prisma.survey_teacher_question_answer.create({
-            data: {
-                survey_teacher_question_id: data.survey_teacher_question_id,
-                student_id: data.student_id,
-                answer: data.answer
-            }
+    async createTeacherAnswer(data: CreateSurveyTeacherAnswerDto[]) {
+        const answer = await this.prisma.survey_teacher_question_answer.createMany({
+            data: data
         });
     }
 
@@ -101,6 +93,6 @@ export class SurveyService {
         const survey = await this.prisma.survey_teacher.createMany({
             data: data
         });
-            
+
     }
 }
