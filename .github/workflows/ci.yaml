@@ -33,5 +33,5 @@ jobs:
           path: ./*
           remote_path: /home/ec2-user/SERVER/
           remote_host: ec2-15-229-58-122.sa-east-1.compute.amazonaws.com
-          remote_user: ubuntu
+          remote_user: ec2-user
           remote_key: "${{ secrets.SSH_PRIVATE_KEY }}"
