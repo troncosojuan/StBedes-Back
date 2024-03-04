@@ -31,7 +31,7 @@ cmake-build-debug/
 *.iws
 
 ## .env
-.env
+.env*
 
 # IntelliJ
 out/
