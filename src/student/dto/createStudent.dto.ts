@@ -54,3 +54,12 @@ export class CreateStudentDto {
     @IsString()
     password: string;
 }
+
+export class CreateStudentByYearDto{
+    @ApiProperty()
+    @IsNumber()
+    student_id: number;
+    @ApiProperty()
+    @IsNumber()
+    year_id: number;
+}

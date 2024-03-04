@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNumber, IsString } from "class-validator";
+import { IsBoolean, IsNumber, IsString } from "class-validator";
 
 export class CreateTeacherDto {
     
@@ -37,3 +37,16 @@ export class CreateTeacherDto {
     @IsString()
     school_email_address: string;
 }
+
+
+export class CreateTeacherBySetDto {
+    @ApiProperty()
+    @IsNumber()
+    set_id: number;
+    @ApiProperty()
+    @IsNumber()
+    teacher_id: number;
+    @ApiProperty()
+    @IsBoolean()
+    is_primary_teacher: boolean;
+} 
