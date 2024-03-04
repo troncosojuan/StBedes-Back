@@ -90,9 +90,29 @@ export class SurveyService {
     }
 
     async createSurveyTeacher(data: CreateSurveyTeacherDto[]) {
-        const survey = await this.prisma.survey_teacher.createMany({
-            data: data
-        });
+        for (const surveyData of data) {
+            await this.prisma.survey_teacher.create({
+                data: {
+                    set_id: surveyData.set_id,
+                    teacher_id: surveyData.teacher_id,
+                    student_has_survey_teacher: {
+                        createMany: {
+                            data: surveyData.student_has_survey_teacher.map(studentId => ({
+                                student_id: studentId
+                            }))
+                        },
+                    },
+                    survey_teacher_question: {
+                        createMany: {
+                            data: surveyData.survey_teacher_question.map(questionId => ({
+                                question_id: questionId
+                            }))
+                        }
+                    }
+                }
+            });
+        }
+
 
     }
 }
