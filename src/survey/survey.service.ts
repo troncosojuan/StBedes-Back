@@ -10,6 +10,29 @@ export class SurveyService {
     constructor(private readonly prisma: PrismaService) { }
 
 
+    async getSurveysTeacherByStudent(id: number) {
+        await this.studentExist(id);
+        const surveys = await this.prisma.student.findFirst({
+            where: {
+                student_id: id
+            },
+            select: {
+                student_has_survey: {
+                    select: {
+                        survey: true,
+                        is_answered: true
+                    }
+                },
+                student_has_survey_teacher: {
+                    select: {
+                        survey_teacher: true,
+                        is_answered: true
+                    }
+                }
+            }
+        })
+    }
+
     async getSurveyTeacherQuestionsBySurveyTeacherId(id: number) {
         await this.surveyExist(id);
         const surveyTeacherQuestions = await this.prisma.survey_teacher_question.findMany({

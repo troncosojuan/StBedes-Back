@@ -8,6 +8,11 @@ import { CreateSurveyAnswerDto, CreateSurveyDto, CreateSurveyParentAnswerDto, Cr
 export class SurveyController {
     constructor(private readonly surveyService: SurveyService) {}
     
+    @Get("get-survey-by-student/:id")
+    async getSurveyTeacher(@Param('id') id: number) {
+        await this.surveyService.getSurveysTeacherByStudent(id);
+    }
+
 
     @Get("get-questions/:id")
     async getSurveyQuestion(@Param('id') id: number) {
