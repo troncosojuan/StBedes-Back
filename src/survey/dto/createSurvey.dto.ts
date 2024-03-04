@@ -14,9 +14,9 @@ export class CreateSurveyTeacherDto{
     @IsArray()
     student_has_survey_teacher: Array<number>;
 
-    @ApiProperty({ type: [{ question_id: Number }] })
+    @ApiProperty({ type: [Number] })
     @IsArray()
-    survey_teacher_question: { question_id: number }[];
+    survey_teacher_question: Array<number>;;
 }
 
 export class CreateSurveyAnswerDto {
