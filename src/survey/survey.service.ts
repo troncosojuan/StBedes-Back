@@ -17,12 +17,6 @@ export class SurveyService {
                 student_id: id
             },
             select: {
-                student_has_survey: {
-                    select: {
-                        survey: true,
-                        is_answered: true
-                    }
-                },
                 student_has_survey_teacher: {
                     select: {
                         survey_teacher: true,
