@@ -8,20 +8,19 @@ import { CreateSurveyAnswerDto, CreateSurveyDto, CreateSurveyParentAnswerDto, Cr
 export class SurveyController {
     constructor(private readonly surveyService: SurveyService) {}
     
-    @Get("get-survey-by-student/:id")
-    async getSurveyTeacher(@Param('id') id: number) {
-        return await this.surveyService.getSurveysTeacherByStudent(id);
-    }
+    // @Get("get-survey-by-student/:id")
+    // async getSurveyTeacher() {
+    //     return await this.surveyService.getSurveyByStudent();
+    // }
 
-
-    @Get("get-questions/:id")
-    async getSurveyQuestion(@Param('id') id: number) {
-        await this.surveyService.getSurveyQuestionBySurveyId(id);
-    }
+    // @Get("get-survey-teacher/:id")
+    // async getSurveyQuestion(@Param('id') id: number) {
+    //     await this.surveyService.getSurveyQuestionBySurveyId(id);
+    // }
 
     @Get("get-teacher-questions/:id")
     async getSurveyTeacherQuestion(@Param('id') id: number) {
-        await this.surveyService.getSurveyTeacherQuestionsBySurveyTeacherId(id);
+        return await this.surveyService.getSurveysTeacherByStudent(id);
     }
 
     @Post("add-teacher-answer")

@@ -4,6 +4,7 @@ import { CreateSurveyAnswerDto, CreateSurveyDto, CreateSurveyParentAnswerDto, Cr
 
 @Injectable()
 export class SurveyService {
+ 
 
 
 
@@ -19,38 +20,95 @@ export class SurveyService {
             select: {
                 student_has_survey_teacher: {
                     select: {
-                        survey_teacher: true,
-                        is_answered: true
+                        is_answered: true,
+                        survey_teacher: {
+                            select: {
+                                teacher: {
+                                    select: {
+                                        full_name: true
+                                    }
+                                },
+                                survey_teacher_question: {
+                                    select: {
+                                        question: {
+                                            select: {
+                                                section: true,
+                                                title: true,
+                                                content: true,
+                                                question_type: {
+                                                    select: {
+                                                        options: true,
+                                                        type: true
+                                                    }
+                                                },
+                    
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                        },
                     }
                 }
             }
-        })
-        return surveys;
-    }
-
-    async getSurveyTeacherQuestionsBySurveyTeacherId(id: number) {
-        await this.surveyExist(id);
-        const surveyTeacherQuestions = await this.prisma.survey_teacher_question.findMany({
-            where: {
-                survey_teacher_id: id
-            }
         });
 
-        // Retornar las preguntas del profesor asociadas a la encuesta
-        return surveyTeacherQuestions;
-    }
-
-    async getSurveyQuestionBySurveyId(id: number) {
-        await this.surveyExist(id);
         const surveyQuestions = await this.prisma.survey_question.findMany({
-            where: {
-                survey_id: id
+            select: {
+             question: {
+                 select: {
+                     section: true,
+                     title: true,
+                     content: true,
+                     question_type: {
+                         select: {
+                             options: true,
+                             type: true
+                         }
+                     }
+                 }
+             },
             }
-        });
-
-        // Retornar las preguntas asociadas a la encuesta
-        return surveyQuestions;
+         });
+        return { surveys, surveyQuestions };
     }
+
+
+    // async getSurveyByStudent() {
+    //     const surveys = await this.prisma.survey_question.findMany({
+    //        select: {
+    //         question: {
+    //             select: {
+    //                 section: true,
+    //                 title: true,
+    //                 content: true,
+    //                 question_type: {
+    //                     select: {
+    //                         options: true,
+    //                         type: true
+    //                     }
+    //                 }
+    //             }
+    //         },
+    //        }
+    //     });
+    //     return surveys;
+    // }
+
+
+    // async getSurveyQuestionBySurveyId(id: number) {
+    //     await this.surveyExist(id);
+    //     const surveyQuestions = await this.prisma.survey_question.findMany({
+    //         where: {
+    //             survey_id: id
+    //         }
+    //     });
+
+    //     // Retornar las preguntas asociadas a la encuesta
+    //     return surveyQuestions;
+    // }
+    
     async createAnswer(data: CreateSurveyAnswerDto[]) {
         const answer = await this.prisma.survey_question_answer.createMany({
             data: data
