@@ -31,6 +31,7 @@ export class SurveyService {
                 }
             }
         })
+        return surveys;
     }
 
     async getSurveyTeacherQuestionsBySurveyTeacherId(id: number) {

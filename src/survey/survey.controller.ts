@@ -10,7 +10,7 @@ export class SurveyController {
     
     @Get("get-survey-by-student/:id")
     async getSurveyTeacher(@Param('id') id: number) {
-        await this.surveyService.getSurveysTeacherByStudent(id);
+        return await this.surveyService.getSurveysTeacherByStudent(id);
     }
 
 
