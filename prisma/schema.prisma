@@ -27,6 +27,7 @@ model question {
   question_type           question_type?            @relation(fields: [question_type_id], references: [question_type_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_question_type")
   survey_question         survey_question[]
   survey_teacher_question survey_teacher_question[]
+  survey_parent_question  survey_parent_question[]
 }
 
 model question_type {
@@ -86,6 +87,7 @@ model student {
   student_has_survey             student_has_survey[]
   student_has_survey_teacher     student_has_survey_teacher[]
   survey_teacher_question_answer survey_teacher_question_answer[]
+  survey_parent_question_answer         survey_parent_question_answer[]
 }
 
 model student_by_year {
@@ -154,7 +156,6 @@ model year_group {
 
 model survey {
   survey_id          Int                  @id @default(autoincrement())
-  date               DateTime?
   created_at         DateTime?            @default(now()) @db.Timestamptz(6)
   student_has_survey student_has_survey[]
   survey_question    survey_question[]
@@ -237,4 +238,30 @@ model student_has_survey {
   created_at  DateTime? @default(now()) @db.Timestamptz(6)
   student     student   @relation(fields: [student_id], references: [student_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_by_teacher_student_fk")
   survey      survey    @relation(fields: [survey_id], references: [survey_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_by_teacher_survey_teacher_fk")
+}
+
+model survey_parent{
+  survey_parent_id   Int @id @default(autoincrement())
+  created_at  DateTime? @default(now()) @db.Timestamptz(6)
+  survey_parent_question survey_parent_question[]
+}
+
+model survey_parent_question{
+  survey_parent_question_id   Int @id @default(autoincrement())
+  survey_parent_id   Int
+  question_id   Int
+  created_at  DateTime? @default(now()) @db.Timestamptz(6)
+  survey_parent   survey_parent @relation(fields: [survey_parent_id], references: [survey_parent_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_parent_question_survey_parent_fk")
+  question   question @relation(fields: [question_id], references: [question_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_parent_question_question_fk")
+  survey_parent_question_answer survey_parent_question_answer[]
+}
+
+model survey_parent_question_answer{
+  id   Int @id @default(autoincrement())
+  survey_parent_question_id   Int
+  student_id   Int
+  answer   String?
+  created_at  DateTime? @default(now()) @db.Timestamptz(6)
+  survey_parent_question   survey_parent_question @relation(fields: [survey_parent_question_id], references: [survey_parent_question_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_parent_question_answer_survey_parent_question_fk")
+  student   student @relation(fields: [student_id], references: [student_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_parent_question_answer_student_fk")
 }

@@ -43,3 +43,27 @@ export class CreateSurveyTeacherAnswerDto{
     @IsString()
     answer: string;
 }
+
+export class CreateSurveyParentAnswerDto{
+    @ApiProperty()
+    @IsNumber()
+    survey_parent_question_id: number;
+    @ApiProperty()
+    @IsNumber()
+    student_id: number;
+    @ApiProperty()
+    @IsString()
+    answer: string;
+}
+
+export class CreateSurveyDto{
+    @ApiProperty({ type: [Number] })
+    @IsArray()
+    survey_question: Array<number>;
+}
+
+export class CreateSurveyParentDto{
+    @ApiProperty({ type: [Number] })
+    @IsArray()
+    survey_parent_question: Array<number>;
+}
