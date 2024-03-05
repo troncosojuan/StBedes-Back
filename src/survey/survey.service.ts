@@ -6,13 +6,9 @@ import { CreateSurveyAnswerDto, CreateSurveyDto, CreateSurveyParentAnswerDto, Cr
 export class SurveyService {
 
 
-
-
     constructor(private readonly prisma: PrismaService) { }
 
-
     async getSurveysTeacherByStudent(id: number) {
-        await this.studentExist(id);
         const surveys = await this.prisma.student.findFirst({
             where: {
                 student_id: id
@@ -46,24 +42,6 @@ export class SurveyService {
         return surveys;
     }
 
-    // survey_teacher_question: {
-    //     select: {
-    //         question: {
-    //             select: {
-    //                 section: true,
-    //                 title: true,
-    //                 content: true,
-    //                 question_type: {
-    //                     select: {
-    //                         options: true,
-    //                         type: true
-    //                     }
-    //                 },
-
-    //             }
-    //         }
-    //     }
-    // }
     async getSurveyByStudent() {
         const surveys = await this.prisma.survey_question.findMany({
             select: {
@@ -87,10 +65,9 @@ export class SurveyService {
 
 
     async getSurveyQuestionBySurveyId(id: number) {
-        await this.surveyExist(id);
-        const surveyQuestions = await this.prisma.survey_question.findMany({
+        const surveyQuestions = await this.prisma.survey_teacher_question.findMany({
             where: {
-                survey_id: id
+                survey_teacher_id: id
             }
         });
 
@@ -177,6 +154,7 @@ export class SurveyService {
             data: data
         });
     }
+    
     async createSurvey(data: CreateSurveyDto[]) {
         for (const surveyData of data) {
             await this.prisma.survey.create({
@@ -191,5 +169,48 @@ export class SurveyService {
                 }
             });
         }
+    }
+    // hacer que sean solo los profesores
+    async getTeacherListByStudent(id: number) {
+        const student = await this.prisma.student.findFirst({
+            where: {
+                student_id: id
+            },
+            include: {
+                set_list: {
+                    include: {
+                        set: {
+                            include: {
+                                teacher_by_set: {
+                                    select: {
+                                        teacher: {
+                                            select: {
+                                                full_name: true
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    
+        if (!student) {
+            throw new Error(`Student with id ${id} not found`);
+        }
+    
+        const teachers: string[] = [];
+        student.set_list.forEach(setItem => {
+            setItem.set.teacher_by_set.forEach(teacherBySet => {
+                const teacherName = teacherBySet.teacher.full_name;
+                if (!teachers.includes(teacherName)) {
+                    teachers.push(teacherName);
+                }
+            });
+        });
+    
+        return teachers;
     }
 }

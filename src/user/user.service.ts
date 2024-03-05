@@ -13,6 +13,7 @@ export class UserService {
             data: {
                 email: createUserDto.email,
                 password: await bcrypt.hash(createUserDto.password, roundsOfHashing),
+                role: "USER",
             }
         });
     }
