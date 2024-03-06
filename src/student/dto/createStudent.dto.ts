@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsNumber, IsString } from "class-validator";
+import { IsArray, IsBoolean, IsNumber, IsString } from "class-validator";
 
 export class CreateStudentDto {
     @ApiProperty()
@@ -55,11 +55,72 @@ export class CreateStudentDto {
     password: string;
 }
 
-export class CreateStudentByYearDto{
+export class CreateStudentByYearDto {
     @ApiProperty()
     @IsNumber()
     student_id: number;
     @ApiProperty()
     @IsNumber()
     year_id: number;
+}
+
+export class CreateFamilyDto {
+    @ApiProperty()
+    @IsNumber()
+    student_id: number;
+
+    @ApiProperty()
+    @IsNumber()
+    parent_id: number;
+
+    @ApiProperty()
+    @IsString()
+    last_update_api_date: string;
+}
+
+
+export class CreateParentDto {
+    @ApiProperty()
+    @IsNumber()
+    parent_id: number;
+    @ApiProperty()
+    @IsString()
+    title: string;
+    @ApiProperty()
+    @IsString()
+    forename: string;
+    @ApiProperty()
+    @IsString()
+    surname: string;
+    @ApiProperty()
+    @IsString()
+    relationship_raw: string;
+    @ApiProperty()
+    @IsString()
+    parental_responsibility: string;
+    @ApiProperty()
+    @IsString()
+    parental_responsibility_contact_type: string;
+    @ApiProperty()
+    @IsString()
+    last_update_api_date: string;
+    @ApiProperty()
+    @IsBoolean()
+    is_first_person_contact: boolean;
+    @ApiProperty()
+    @IsNumber()
+    contact_id: number;
+    @ApiProperty()
+    @IsString()
+    telephone: string;
+    @ApiProperty()
+    @IsString()
+    email_address: string;
+    @ApiProperty()
+    @IsString()
+    pupil_status: string;
+    @ApiProperty()
+    @IsString()
+    password: string;
+
 }

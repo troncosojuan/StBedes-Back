@@ -1,7 +1,7 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { StudentService } from './student.service';
-import { CreateStudentByYearDto, CreateStudentDto } from './dto/createStudent.dto';
+import { CreateFamilyDto, CreateParentDto, CreateStudentByYearDto, CreateStudentDto } from './dto/createStudent.dto';
 
 @ApiTags('student')
 @Controller('student')
@@ -25,6 +25,19 @@ export class StudentController {
     @ApiResponse({ status: 201, description: "Students created successfully" })
     async createStudentByYear(@Body() createStudentDto: CreateStudentByYearDto[]) {
         await this.studentService.createStudentByYear(createStudentDto);
+    }
+
+    @Post("create-family")
+    @ApiResponse({ status: 201, description: "Families created successfully" })
+    async createFamily(@Body() createFamilyDto: CreateFamilyDto[]) {
+        await this.studentService.createFamily(createFamilyDto);
+    }
+
+
+    @Post("create-parent")
+    @ApiResponse({ status: 201, description: "Parents created successfully" })
+    async createParent(@Body() createParentDto: CreateParentDto[]) {
+        await this.studentService.createParent(createParentDto);
     }
 
 }
