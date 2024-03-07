@@ -6,7 +6,6 @@ import { SurveyByStudentTeacherSubjectDto } from './dto/getSurvey.dto';
 @Injectable()
 export class SurveyService {
 
-
     constructor(private readonly prisma: PrismaService) { }
 
     async getSurveysTeacherByStudent(id: number) {
@@ -231,9 +230,91 @@ export class SurveyService {
         return teachers;
     }
 
-
-    async getSurveyTeacherByStudent(data: SurveyByStudentTeacherSubjectDto) {
-
+    async getSurveyByParentId(id: number) {
+        const surveyQuestions = await this.prisma.parent.findMany({
+            where: {
+                parent_id: id
+            },
+            select: {
+                family: {
+                    select: {
+                        student: {
+                            select: {
+                                student_id: true,
+                                forename: true,
+                                surname: true
+                            }
+                        }
+                    }
+                },
+            }
+        });
+        // Retornar las preguntas asociadas a la encuesta
+        return surveyQuestions;
     }
+
+    async getQuestionParentByStudent(id: number) {
+
+        const yearId = await this.prisma.student_by_year.findFirst({
+            where: {
+                student_id: id
+            },
+            select: {
+                year_id: true
+            }
+        });
+
+        if (yearId.year_id < 7) {
+            const question = await this.prisma.survey_parent_question.findMany({
+                where: {
+                    question_id: {
+                        not: 49
+                    },
+                },
+                select: {
+                    question: {
+                        select: {
+                            section: true,
+                            title: true,
+                            content: true,
+                            question_type: {
+                                select: {
+                                    options: true,
+                                    type: true
+                                }
+                            }
+                        }
+                    },
+                }
+            });
+            return question;
+        } else {
+            const question = await this.prisma.survey_parent_question.findMany({
+                where: {
+                    question_id: {
+                        not: 50
+                    },
+                },
+                select: {
+                    question: {
+                        select: {
+                            section: true,
+                            title: true,
+                            content: true,
+                            question_type: {
+                                select: {
+                                    options: true,
+                                    type: true
+                                }
+                            }
+                        }
+                    },
+                }
+            });
+            return question;
+        }
+    }
+
+    
 
 }
