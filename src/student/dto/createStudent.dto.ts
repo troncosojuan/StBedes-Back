@@ -67,11 +67,11 @@ export class CreateStudentByYearDto {
 export class CreateFamilyDto {
     @ApiProperty()
     @IsNumber()
-    student_id: number;
-
+    parent_id: number;
+    
     @ApiProperty()
     @IsNumber()
-    parent_id: number;
+    student_id: number;
 
     @ApiProperty()
     @IsString()
