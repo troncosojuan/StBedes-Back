@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { SurveyService } from './survey.service';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateSurveyAnswerDto, CreateSurveyDto, CreateSurveyParentAnswerDto, CreateSurveyParentDto, CreateSurveyTeacherAnswerDto, CreateSurveyTeacherDto } from './dto/createSurvey.dto';
+import { SurveyByStudentTeacherSubjectDto } from './dto/getSurvey.dto';
 
 @ApiTags('survey')
 @Controller('survey')
@@ -13,9 +14,9 @@ export class SurveyController {
         return await this.surveyService.getSurveyByStudent();
     }
 
-    @Get("get-question-teacher-by-survey/:id")
+    @Get("get-question-teacher-by-survey-teacher/:id")
     async getSurveyQuestion(@Param('id') id: number) {
-        await this.surveyService.getSurveyQuestionBySurveyId(id);
+        return await this.surveyService.getSurveyQuestionBySurveyId(id);
     }
 
     @Get("get-survey-teacher-by-student/:id")
@@ -26,6 +27,11 @@ export class SurveyController {
     @Get("teacher-list-by-student/:id")
     async getTeacherListByStudent(@Param('id') id: number) {
         return await this.surveyService.getTeacherListByStudent(id);
+    }
+
+    @Get("get-survey")
+    async getSurveyTeacherByStudent(@Body() data: SurveyByStudentTeacherSubjectDto) {
+        return await this.surveyService.getSurveyTeacherByStudent(data);
     }
 
     @Post("add-survey")

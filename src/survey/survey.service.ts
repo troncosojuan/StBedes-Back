@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateSurveyAnswerDto, CreateSurveyDto, CreateSurveyParentAnswerDto, CreateSurveyParentDto, CreateSurveyTeacherAnswerDto, CreateSurveyTeacherDto } from './dto/createSurvey.dto';
+import { SurveyByStudentTeacherSubjectDto } from './dto/getSurvey.dto';
 
 @Injectable()
 export class SurveyService {
@@ -19,6 +20,7 @@ export class SurveyService {
                         is_answered: true,
                         survey_teacher: {
                             select: {
+                                survey_teacher_id: true,
                                 teacher: {
                                     select: {
                                         full_name: true
@@ -68,9 +70,24 @@ export class SurveyService {
         const surveyQuestions = await this.prisma.survey_teacher_question.findMany({
             where: {
                 survey_teacher_id: id
+            },
+            select: {
+                survey_teacher_question_id: true,
+                question: {
+                    select: {
+                        section: true,
+                        title: true,
+                        content: true,
+                        question_type: {
+                            select: {
+                                options: true,
+                                type: true
+                            }
+                        }
+                    }
+                },
             }
         });
-
         // Retornar las preguntas asociadas a la encuesta
         return surveyQuestions;
     }
@@ -154,7 +171,7 @@ export class SurveyService {
             data: data
         });
     }
-    
+
     async createSurvey(data: CreateSurveyDto[]) {
         for (const surveyData of data) {
             await this.prisma.survey.create({
@@ -196,11 +213,11 @@ export class SurveyService {
                 }
             }
         });
-    
+
         if (!student) {
             throw new Error(`Student with id ${id} not found`);
         }
-    
+
         const teachers: string[] = [];
         student.set_list.forEach(setItem => {
             setItem.set.teacher_by_set.forEach(teacherBySet => {
@@ -210,7 +227,13 @@ export class SurveyService {
                 }
             });
         });
-    
+
         return teachers;
     }
+
+
+    async getSurveyTeacherByStudent(data: SurveyByStudentTeacherSubjectDto) {
+
+    }
+
 }
