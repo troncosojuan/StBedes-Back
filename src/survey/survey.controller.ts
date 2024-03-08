@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { SurveyService } from './survey.service';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreateSurveyAnswerDto, CreateSurveyDto, CreateSurveyParentAnswerDto, CreateSurveyParentDto, CreateSurveyTeacherAnswerDto, CreateSurveyTeacherDto } from './dto/createSurvey.dto';
-import { SurveyByStudentTeacherSubjectDto } from './dto/getSurvey.dto';
+import { CreateSurveyAnswerDto, CreateSurveyDto, CreateSurveyParentAnswerDto, CreateSurveyParentDto, CreateSurveyTeacherAnswerAndRelationDto, CreateSurveyTeacherAnswerDto, CreateSurveyTeacherDto } from './dto/createSurvey.dto';
+
 
 @ApiTags('survey')
 @Controller('survey')
@@ -55,7 +55,7 @@ export class SurveyController {
     }
 
     @Post("add-answer-teacher")
-    async createTeacherAnswer(@Body() data: CreateSurveyTeacherAnswerDto[]) {
+    async createTeacherAnswer(@Body() data: CreateSurveyTeacherAnswerAndRelationDto) {
         await this.surveyService.createTeacherAnswer(data);
     }
 

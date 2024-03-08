@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateSurveyAnswerDto, CreateSurveyDto, CreateSurveyParentAnswerDto, CreateSurveyParentDto, CreateSurveyTeacherAnswerDto, CreateSurveyTeacherDto } from './dto/createSurvey.dto';
-import { SurveyByStudentTeacherSubjectDto } from './dto/getSurvey.dto';
+import { CreateSurveyAnswerDto, CreateSurveyDto, CreateSurveyParentAnswerDto, CreateSurveyParentDto, CreateSurveyTeacherAnswerAndRelationDto, CreateSurveyTeacherAnswerDto, CreateSurveyTeacherDto } from './dto/createSurvey.dto';
 
 @Injectable()
 export class SurveyService {
@@ -16,6 +15,7 @@ export class SurveyService {
             select: {
                 student_has_survey_teacher: {
                     select: {
+                        id: true,
                         is_answered: true,
                         survey_teacher: {
                             select: {
@@ -97,9 +97,18 @@ export class SurveyService {
         });
 
     }
-    async createTeacherAnswer(data: CreateSurveyTeacherAnswerDto[]) {
+    async createTeacherAnswer(data: CreateSurveyTeacherAnswerAndRelationDto) {
         const answer = await this.prisma.survey_teacher_question_answer.createMany({
-            data: data
+            data: data.CreateSurveyTeacherAnswerDto
+        });
+        
+        await this.prisma.student_has_survey_teacher.update({
+            where: {
+               id: data.student_has_survey_teacher
+            },
+            data: {
+                is_answered: true
+            }
         });
     }
 

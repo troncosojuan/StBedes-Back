@@ -44,6 +44,7 @@ export class CreateSurveyTeacherAnswerDto{
     answer: string;
 }
 
+
 export class CreateSurveyParentAnswerDto{
     @ApiProperty()
     @IsNumber()
@@ -66,4 +67,12 @@ export class CreateSurveyParentDto{
     @ApiProperty({ type: [Number] })
     @IsArray()
     survey_parent_question: Array<number>;
+}
+
+export class CreateSurveyTeacherAnswerAndRelationDto{
+    @ApiProperty()
+    @IsNumber()
+    student_has_survey_teacher: number;
+    @ApiProperty()
+    CreateSurveyTeacherAnswerDto: CreateSurveyTeacherAnswerDto[];
 }
