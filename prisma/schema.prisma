@@ -8,20 +8,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?  @db.Text
-  access_token       String?  @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?  @db.Text
-  session_state      String?
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -53,8 +52,9 @@ model VerificationToken {
 
   @@unique([identifier, token])
 }
+
 model parent {
-  parent_id                            Int       @id
+  parent_id                            Int                        @id
   title                                String?
   forename                             String?
   surname                              String?
@@ -68,8 +68,9 @@ model parent {
   email_address                        String?
   pupil_status                         String?
   password                             String?
-  created_at                           DateTime? @default(now()) @db.Timestamptz(6)
+  created_at                           DateTime?                  @default(now()) @db.Timestamptz(6)
   family                               family[]
+  parent_has_survey_parent             parent_has_survey_parent[]
 }
 
 model family {
@@ -154,6 +155,7 @@ model student {
   survey_teacher_question_answer survey_teacher_question_answer[]
   survey_parent_question_answer  survey_parent_question_answer[]
   family                         family[]
+  student_has_survey             student_has_survey[]
 }
 
 model student_by_year {
@@ -221,9 +223,10 @@ model year_group {
 }
 
 model survey {
-  survey_id       Int               @id @default(autoincrement())
-  created_at      DateTime?         @default(now()) @db.Timestamptz(6)
-  survey_question survey_question[]
+  survey_id          Int                  @id @default(autoincrement())
+  created_at         DateTime?            @default(now()) @db.Timestamptz(6)
+  survey_question    survey_question[]
+  student_has_survey student_has_survey[]
 }
 
 model survey_status {
@@ -296,9 +299,10 @@ model student_has_survey_teacher {
 }
 
 model survey_parent {
-  survey_parent_id       Int                      @id @default(autoincrement())
-  created_at             DateTime?                @default(now()) @db.Timestamptz(6)
-  survey_parent_question survey_parent_question[]
+  survey_parent_id         Int                        @id @default(autoincrement())
+  created_at               DateTime?                  @default(now()) @db.Timestamptz(6)
+  survey_parent_question   survey_parent_question[]
+  parent_has_survey_parent parent_has_survey_parent[]
 }
 
 model survey_parent_question {
@@ -319,4 +323,24 @@ model survey_parent_question_answer {
   created_at                DateTime?              @default(now()) @db.Timestamptz(6)
   survey_parent_question    survey_parent_question @relation(fields: [survey_parent_question_id], references: [survey_parent_question_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_parent_question_answer_survey_parent_question_fk")
   student                   student                @relation(fields: [student_id], references: [student_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_parent_question_answer_student_fk")
+}
+
+model parent_has_survey_parent {
+  id               Int           @id @default(autoincrement())
+  survey_parent_id Int
+  parent_id        Int
+  is_answered      Boolean       @default(false)
+  created_at       DateTime?     @default(now()) @db.Timestamptz(6)
+  parent           parent        @relation(fields: [parent_id], references: [parent_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_by_parent_parent_fk")
+  survey_parent    survey_parent @relation(fields: [survey_parent_id], references: [survey_parent_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_by_parent_survey_parent_fk")
+}
+
+model student_has_survey {
+  id          Int       @id @default(autoincrement())
+  survey_id   Int
+  student_id  Int
+  is_answered Boolean   @default(false)
+  created_at  DateTime? @default(now()) @db.Timestamptz(6)
+  student     student   @relation(fields: [student_id], references: [student_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_by_student_student_fk")
+  survey      survey    @relation(fields: [survey_id], references: [survey_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_by_student_survey_fk")
 }

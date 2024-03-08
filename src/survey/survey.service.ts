@@ -1,47 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateSurveyAnswerDto, CreateSurveyDto, CreateSurveyParentAnswerDto, CreateSurveyParentDto, CreateSurveyTeacherAnswerAndRelationDto, CreateSurveyTeacherAnswerDto, CreateSurveyTeacherDto } from './dto/createSurvey.dto';
+import { CreateSurveyAnswerAndRelationDto, CreateSurveyAnswerDto, CreateSurveyDto } from './dto/createSurvey.dto';
 
 @Injectable()
 export class SurveyService {
 
+
     constructor(private readonly prisma: PrismaService) { }
 
-    async getSurveysTeacherByStudent(id: number) {
-        const surveys = await this.prisma.student.findFirst({
-            where: {
-                student_id: id
-            },
-            select: {
-                student_has_survey_teacher: {
-                    select: {
-                        id: true,
-                        is_answered: true,
-                        survey_teacher: {
-                            select: {
-                                survey_teacher_id: true,
-                                teacher: {
-                                    select: {
-                                        full_name: true
-                                    }
-                                },
-                                set: {
-                                    select: {
-                                        subject: {
-                                            select: {
-                                                subject_name: true
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                        }
-                    }
-                }
-            }
-        });
-        return surveys;
-    }
+
 
     async getSurveyByStudent() {
         const surveys = await this.prisma.survey_question.findMany({
@@ -65,52 +32,23 @@ export class SurveyService {
     }
 
 
-    async getSurveyQuestionBySurveyId(id: number) {
-        const surveyQuestions = await this.prisma.survey_teacher_question.findMany({
-            where: {
-                survey_teacher_id: id
-            },
-            select: {
-                survey_teacher_question_id: true,
-                question: {
-                    select: {
-                        section: true,
-                        title: true,
-                        content: true,
-                        question_type: {
-                            select: {
-                                options: true,
-                                type: true
-                            }
-                        }
-                    }
-                },
-            }
-        });
-        // Retornar las preguntas asociadas a la encuesta
-        return surveyQuestions;
-    }
 
-    async createAnswer(data: CreateSurveyAnswerDto[]) {
+
+    async createAnswer(data: CreateSurveyAnswerAndRelationDto) {
         const answer = await this.prisma.survey_question_answer.createMany({
-            data: data
+            data: data.createSurveyAnswerDto
         });
 
-    }
-    async createTeacherAnswer(data: CreateSurveyTeacherAnswerAndRelationDto) {
-        const answer = await this.prisma.survey_teacher_question_answer.createMany({
-            data: data.CreateSurveyTeacherAnswerDto
-        });
-        
-        await this.prisma.student_has_survey_teacher.update({
+        await this.prisma.student_has_survey.update({
             where: {
-               id: data.student_has_survey_teacher
+                id: data.student_has_survey_id
             },
             data: {
                 is_answered: true
             }
         });
     }
+
 
     async studentExist(id: number) {
         const student = await this.prisma.student.findUnique({
@@ -134,51 +72,9 @@ export class SurveyService {
         }
     }
 
-    async createSurveyTeacher(data: CreateSurveyTeacherDto[]) {
-        for (const surveyData of data) {
-            await this.prisma.survey_teacher.create({
-                data: {
-                    set_id: surveyData.set_id,
-                    teacher_id: surveyData.teacher_id,
-                    student_has_survey_teacher: {
-                        createMany: {
-                            data: surveyData.student_has_survey_teacher.map(studentId => ({
-                                student_id: studentId
-                            }))
-                        },
-                    },
-                    survey_teacher_question: {
-                        createMany: {
-                            data: surveyData.survey_teacher_question.map(questionId => ({
-                                question_id: questionId
-                            }))
-                        }
-                    }
-                }
-            });
-        }
-    }
 
-    async createSurveyParent(data: CreateSurveyParentDto[]) {
-        for (const surveyData of data) {
-            await this.prisma.survey_parent.create({
-                data: {
-                    survey_parent_question: {
-                        createMany: {
-                            data: surveyData.survey_parent_question.map(questionId => ({
-                                question_id: questionId
-                            }))
-                        }
-                    },
-                }
-            });
-        }
-    }
-    async createParentAnswer(data: CreateSurveyParentAnswerDto[]) {
-        await this.prisma.survey_parent_question_answer.createMany({
-            data: data
-        });
-    }
+
+
 
     async createSurvey(data: CreateSurveyDto[]) {
         for (const surveyData of data) {
@@ -195,135 +91,39 @@ export class SurveyService {
             });
         }
     }
-    // hacer que sean solo los profesores
-    async getTeacherListByStudent(id: number) {
-        const student = await this.prisma.student.findFirst({
+
+
+
+
+
+
+    async getSurveyByStudentId(id: number) {
+        const survey = await this.prisma.student.findFirst({
             where: {
                 student_id: id
             },
-            include: {
-                set_list: {
-                    include: {
-                        set: {
-                            include: {
-                                teacher_by_set: {
-                                    select: {
-                                        teacher: {
-                                            select: {
-                                                full_name: true
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        if (!student) {
-            throw new Error(`Student with id ${id} not found`);
-        }
-
-        const teachers: string[] = [];
-        student.set_list.forEach(setItem => {
-            setItem.set.teacher_by_set.forEach(teacherBySet => {
-                const teacherName = teacherBySet.teacher.full_name;
-                if (!teachers.includes(teacherName)) {
-                    teachers.push(teacherName);
-                }
-            });
-        });
-
-        return teachers;
-    }
-
-    async getSurveyByParentId(id: number) {
-        const surveyQuestions = await this.prisma.parent.findMany({
-            where: {
-                parent_id: id
-            },
             select: {
-                family: {
+                student_has_survey: {
                     select: {
-                        student: {
+                        id: true,
+                        is_answered: true,
+                        survey: {
                             select: {
-                                student_id: true,
-                                forename: true,
-                                surname: true
+                                survey_id: true,
                             }
                         }
                     }
-                },
-            }
-        });
-        // Retornar las preguntas asociadas a la encuesta
-        return surveyQuestions;
-    }
-
-    async getQuestionParentByStudent(id: number) {
-
-        const yearId = await this.prisma.student_by_year.findFirst({
-            where: {
-                student_id: id
-            },
-            select: {
-                year_id: true
-            }
-        });
-
-        if (yearId.year_id < 7) {
-            const question = await this.prisma.survey_parent_question.findMany({
-                where: {
-                    question_id: {
-                        not: 49
-                    },
-                },
-                select: {
-                    question: {
-                        select: {
-                            section: true,
-                            title: true,
-                            content: true,
-                            question_type: {
-                                select: {
-                                    options: true,
-                                    type: true
-                                }
-                            }
-                        }
-                    },
                 }
-            });
-            return question;
-        } else {
-            const question = await this.prisma.survey_parent_question.findMany({
-                where: {
-                    question_id: {
-                        not: 50
-                    },
-                },
-                select: {
-                    question: {
-                        select: {
-                            section: true,
-                            title: true,
-                            content: true,
-                            question_type: {
-                                select: {
-                                    options: true,
-                                    type: true
-                                }
-                            }
-                        }
-                    },
-                }
-            });
-            return question;
+            }
         }
+        );
+        return survey;
     }
 
-    
+
+
+
+
+
 
 }

@@ -11,6 +11,8 @@ import { SetlistModule } from './setlist/setlist.module';
 import { YearGroupModule } from './year_group/year_group.module';
 import { QuestionTypeModule } from './question_type/question_type.module';
 import { ReportModule } from './report/report.module';
+import { SurveyTeacherModule } from './survey-teacher/survey-teacher.module';
+import { SurveyParentModule } from './survey-parent/survey-parent.module';
 
 
 
@@ -27,6 +29,8 @@ import { ReportModule } from './report/report.module';
     YearGroupModule,
     QuestionTypeModule,
     ReportModule,
+    SurveyTeacherModule,
+    SurveyParentModule,
   ],
   providers: [
     PrismaService,
