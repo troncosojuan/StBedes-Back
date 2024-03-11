@@ -9,12 +9,12 @@ import { CreateSurveyAnswerAndRelationDto, CreateSurveyDto } from './dto/createS
 export class SurveyController {
     constructor(private readonly surveyService: SurveyService) { }
 
-    @Get("get-survey-student")
+    @Get("get-school-question")
     async getSurveyTeacher() {
         return await this.surveyService.getSurveyByStudent();
     }
 
-    @Get("get-survey-by-student/:id")
+    @Get("get-school-survey-by-student/:id")
     async getSurveyByStudent(@Param('id') id: number) {
         return await this.surveyService.getSurveyByStudentId(id);
     }
