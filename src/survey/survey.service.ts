@@ -98,7 +98,7 @@ export class SurveyService {
                     },
                     student_has_survey: {
                         createMany: {
-                            data: surveyData.student_has_survey_id.map(studentId => ({
+                            data: surveyData.student_has_survey.map(studentId => ({
                                 student_id: studentId
                             }))
                         }

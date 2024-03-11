@@ -19,7 +19,7 @@ export class CreateSurveyDto {
     survey_question: Array<number>;
     @ApiProperty()
     @IsArray()
-    student_has_survey_id: Array<number>;
+    student_has_survey: Array<number>;
 }
 
 export class CreateSurveyAnswerAndRelationDto{
