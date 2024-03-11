@@ -123,40 +123,7 @@ export class ReportService {
           totalAgreeAndNotSurePercentage
         });
       }
-      const agreeCounts = await this.prisma.survey_teacher_question_answer.aggregate({
-        where: {
-          survey_teacher_question_id: {
-            in: [1, 2, 3, 4, 5], // IDs de las preguntas especificadas
-          },
-          answer: {
-            in: ["Agree"],
-          },
-        },
-        _count: {
-          answer: true,
-        },
-      });
 
-      const agreeAndNotSureCounts = await this.prisma.survey_teacher_question_answer.aggregate({
-        where: {
-          survey_teacher_question_id: {
-            in: [1, 2, 3, 4, 5], // IDs de las preguntas especificadas
-          },
-          answer: {
-            in: ["Agree", "Not Sure"],
-          },
-        },
-        _count: {
-          answer: true,
-        },
-      });
-  
-      const totalAgree = agreeCounts._count.answer;
-      const totalAgreePercentage = (totalAgree / studentCount) * 100;
-      const totalAgreeAndNotSure = agreeAndNotSureCounts._count.answer;
-      const totalAgreeAndNotSurePercentage = (totalAgreeAndNotSure / studentCount) * 100;
-  
-      // Agregar la información del conjunto al resultado final
       
     }
   

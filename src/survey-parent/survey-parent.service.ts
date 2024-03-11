@@ -134,7 +134,7 @@ export class SurveyParentService {
                     },
                     student_has_survey_parent: {
                         createMany: {
-                            data: surveyData.student_has_survey_parent_id.map(studentId => ({
+                            data: surveyData.student_has_survey_parent.map(studentId => ({
                                 student_id: studentId
                             }))
                         }
