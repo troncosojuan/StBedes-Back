@@ -26,6 +26,15 @@ export class SurveyService {
                         }
                     }
                 },
+                survey: {
+                    select: {
+                        student_has_survey: {
+                            select: {
+                                is_answered: true
+                            }
+                        }
+                    }
+                }
             }
         });
         return surveys;
