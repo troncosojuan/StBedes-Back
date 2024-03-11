@@ -70,7 +70,7 @@ model parent {
   password                             String?
   created_at                           DateTime?                  @default(now()) @db.Timestamptz(6)
   family                               family[]
-  parent_has_survey_parent             parent_has_survey_parent[]
+  
 }
 
 model family {
@@ -156,6 +156,7 @@ model student {
   survey_parent_question_answer  survey_parent_question_answer[]
   family                         family[]
   student_has_survey             student_has_survey[]
+  student_has_survey_parent      student_has_survey_parent[]
 }
 
 model student_by_year {
@@ -302,7 +303,7 @@ model survey_parent {
   survey_parent_id         Int                        @id @default(autoincrement())
   created_at               DateTime?                  @default(now()) @db.Timestamptz(6)
   survey_parent_question   survey_parent_question[]
-  parent_has_survey_parent parent_has_survey_parent[]
+  student_has_survey_parent student_has_survey_parent[]
 }
 
 model survey_parent_question {
@@ -325,13 +326,13 @@ model survey_parent_question_answer {
   student                   student                @relation(fields: [student_id], references: [student_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_parent_question_answer_student_fk")
 }
 
-model parent_has_survey_parent {
+model student_has_survey_parent {
   id               Int           @id @default(autoincrement())
   survey_parent_id Int
-  parent_id        Int
+  student_id       Int
   is_answered      Boolean       @default(false)
   created_at       DateTime?     @default(now()) @db.Timestamptz(6)
-  parent           parent        @relation(fields: [parent_id], references: [parent_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_by_parent_parent_fk")
+  student          student       @relation(fields: [student_id], references: [student_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_by_parent_parent_fk")
   survey_parent    survey_parent @relation(fields: [survey_parent_id], references: [survey_parent_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_by_parent_survey_parent_fk")
 }
 

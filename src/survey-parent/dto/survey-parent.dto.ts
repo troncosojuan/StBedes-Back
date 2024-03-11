@@ -17,13 +17,16 @@ export class CreateSurveyParentDto{
     @ApiProperty({ type: [Number] })
     @IsArray()
     survey_parent_question: Array<number>;
+    @ApiProperty()
+    @IsArray()
+    student_has_survey_parent_id: Array<number>;
 }
 
 
 export class CreateSurveyParentAnswerAndRelationDto{
     @ApiProperty()
     @IsNumber()
-    parent_has_survey_parent_id: number;
+    student_has_survey_parent_id: number;
     @ApiProperty()
     createSurveyParentAnswerDto: CreateSurveyParentAnswerDto[];
 }

@@ -17,6 +17,9 @@ export class CreateSurveyDto {
     @ApiProperty({ type: [Number] })
     @IsArray()
     survey_question: Array<number>;
+    @ApiProperty()
+    @IsArray()
+    student_has_survey_id: Array<number>;
 }
 
 export class CreateSurveyAnswerAndRelationDto{

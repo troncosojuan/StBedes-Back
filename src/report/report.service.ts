@@ -2,11 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { Response } from 'express';
 import * as PDFDocument from 'pdfkit';
 import * as fs from 'fs';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ReportService {
 
-  
+  constructor(private readonly prisma: PrismaService) { }
+
 
   async generateReport(res: Response) {
     const doc = new PDFDocument();
@@ -24,8 +26,8 @@ export class ReportService {
 
     const currentDate = new Date();
     const monthYear = currentDate.toLocaleString('en-us', { month: 'long', year: 'numeric' });
-    doc.fontSize(25).text(`Whole School Pupil Voice - ${monthYear}`, { align: 'center' , undefined});
-    
+    doc.fontSize(25).text(`Whole School Pupil Voice - ${monthYear}`, { align: 'center', undefined });
+
     doc.moveDown().fontSize(12).text('Pupils were asked five questions about each of their subjects:');
 
     questions.forEach((question, index) => {
@@ -36,7 +38,32 @@ export class ReportService {
         doc.moveDown().fontSize(12).text('\u2756 ', { continued: true }).text(firstWord, { bold: true }).text(restOfQuestion);
       }
     });
-    
+
     doc.end();
   }
+
+
+  async getSubjectReport(id: number) {
+    const sets = await this.prisma.set.findMany({
+      where: {
+        subject_id: id,
+      },
+      select: {
+        set_code: true,
+        set_list: {
+          select: {
+            student_id: true,
+          },
+        },
+      },
+    });
+  
+    const result = sets.map((set) => ({
+      setCode: set.set_code,
+      studentCount: set.set_list.length,
+    }));
+  
+    return result;
+  }
+
 }

@@ -13,17 +13,23 @@ export class SurveyParentService {
                 parent_id: id
             },
             select: {
-                parent_has_survey_parent: {
+                family: {
                     select: {
-                        id: true,
-                        is_answered: true,
-                        survey_parent: {
+                        student: {
                             select: {
-                                survey_parent_id: true,
+                                student_id: true,
+                                forename: true,
+                                surname: true,
+                                student_has_survey_parent: {
+                                    select: {
+                                        id: true,
+                                        is_answered: true
+                                    }
+                                }
                             }
                         }
                     }
-                }
+                },
             }
         }
         );
@@ -126,6 +132,13 @@ export class SurveyParentService {
                             }))
                         }
                     },
+                    student_has_survey_parent: {
+                        createMany: {
+                            data: surveyData.student_has_survey_parent_id.map(studentId => ({
+                                student_id: studentId
+                            }))
+                        }
+                    }
                 }
             });
         }
@@ -135,9 +148,9 @@ export class SurveyParentService {
             data: data.createSurveyParentAnswerDto
         });
 
-        await this.prisma.parent_has_survey_parent.update({
+        await this.prisma.student_has_survey_parent.update({
             where: {
-                id: data.parent_has_survey_parent_id
+                id: data.student_has_survey_parent_id
             },
             data: {
                 is_answered: true
