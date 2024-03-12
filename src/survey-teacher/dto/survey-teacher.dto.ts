@@ -28,6 +28,16 @@ export class CreateSurveyTeacherDto{
     survey_teacher_question: Array<number>;;
 }
 
+export class CreateSurveyTeacherTriggerDto{
+    @ApiProperty()
+    @IsNumber()
+    survey_teacher_id: number;
+    @ApiProperty({ type: [Number] })
+    @IsArray()
+    student_has_survey_teacher: Array<number>;
+}
+
+
 export class CreateSurveyTeacherAnswerDto{
     @ApiProperty()
     @IsNumber()
@@ -39,3 +49,4 @@ export class CreateSurveyTeacherAnswerDto{
     @IsString()
     answer: string;
 }
+

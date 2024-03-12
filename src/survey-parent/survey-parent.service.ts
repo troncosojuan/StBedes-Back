@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateSurveyParentAnswerAndRelationDto, CreateSurveyParentAnswerDto, CreateSurveyParentDto } from './dto/survey-parent.dto';
+import { CreateSurveyParentAnswerAndRelationDto, CreateSurveyParentAnswerDto, CreateSurveyParentDto, CreateSurveyParentTriggerDto } from './dto/survey-parent.dto';
 
 @Injectable()
 export class SurveyParentService {
+   
 
     constructor(private readonly prisma: PrismaService) { }
 
@@ -122,8 +123,10 @@ export class SurveyParentService {
     }
 
     async createSurveyParent(data: CreateSurveyParentDto[]) {
+        const createdSurveyParentIds: number[] = []; // Array para almacenar los IDs creados
+    
         for (const surveyData of data) {
-            await this.prisma.survey_parent.create({
+            const createdSurveyParent = await this.prisma.survey_parent.create({
                 data: {
                     survey_parent_question: {
                         createMany: {
@@ -141,8 +144,14 @@ export class SurveyParentService {
                     }
                 }
             });
+    
+            // Almacenar el ID del survey_parent creado en el array
+            createdSurveyParentIds.push(createdSurveyParent.survey_parent_id);
         }
+    
+        return createdSurveyParentIds; // Devolver el array de IDs
     }
+
     async createParentAnswer(data: CreateSurveyParentAnswerAndRelationDto) {
         await this.prisma.survey_parent_question_answer.createMany({
             data: data.createSurveyParentAnswerDto
@@ -156,6 +165,18 @@ export class SurveyParentService {
                 is_answered: true
             }
         });
+    }
+
+    createSurveyParentTrigger(data: CreateSurveyParentTriggerDto[]) {
+        for (const surveyData of data) {
+            this.prisma.student_has_survey_parent.createMany({
+                data: surveyData.student_has_survey_parent.map(studentId => ({
+                    student_id: studentId,
+                    survey_parent_id: surveyData.survey_parent_id
+                }
+                ))
+            })
+        }
     }
 
 }

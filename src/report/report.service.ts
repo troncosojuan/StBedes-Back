@@ -7,6 +7,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 @Injectable()
 export class ReportService {
 
+
   constructor(private readonly prisma: PrismaService) { }
 
 
@@ -42,7 +43,203 @@ export class ReportService {
     doc.end();
   }
 
+  async getWholeCollegeResponses() {
+    // Obtener la lista de grados y la cantidad de estudiantes para cada grado
+    const yearGroups = await this.prisma.year_group.findMany({
+        include: {
+            set: {
+                include: {
+                    set_list: {
+                        select: {
+                            student_id: true,
+                        },
+                    },
+                },
+            },
+        },
+    });
 
+    // Crear un objeto para almacenar el resultado final
+    const result = {};
+
+    // Recorrer cada grado y calcular la cantidad de estudiantes y los porcentajes de respuestas
+    for (const yearGroup of yearGroups) {
+        const grade = yearGroup.name;
+        const sets = yearGroup.set;
+        let totalStudentCount = 0;
+        let totalAgreeCounts = Array(5).fill(0);
+        let totalAgreeAndNotSureCounts = Array(5).fill(0);
+
+        // Calcular la cantidad total de estudiantes y los totales de respuestas "Agree" y "Agree and Not Sure" por pregunta
+        for (const set of sets) {
+            const studentCount = set.set_list?.length || 0;
+            totalStudentCount += studentCount;
+
+            for (let i = 1; i <= 5; i++) {
+                const agreeCounts = await this.prisma.survey_teacher_question_answer.aggregate({
+                    where: {
+                        survey_teacher_question_id: i,
+                        answer: {
+                            in: ["Agree"],
+                        },
+                    },
+                    _count: {
+                        answer: true,
+                    },
+                });
+
+                const agreeAndNotSureCounts = await this.prisma.survey_teacher_question_answer.aggregate({
+                    where: {
+                        survey_teacher_question_id: i,
+                        answer: {
+                            in: ["Agree", "Not Sure"],
+                        },
+                    },
+                    _count: {
+                        answer: true,
+                    },
+                });
+
+                totalAgreeCounts[i - 1] += agreeCounts._count.answer;
+                totalAgreeAndNotSureCounts[i - 1] += agreeAndNotSureCounts._count.answer;
+            }
+        }
+
+        // Calcular los porcentajes de respuestas "Agree" y "Agree and Not Sure" por pregunta
+        const totalAgreePercentages = totalAgreeCounts.map(count => (count / totalStudentCount) * 100);
+        const totalAgreeAndNotSurePercentages = totalAgreeAndNotSureCounts.map(count => (count / totalStudentCount) * 100);
+
+        // Agregar los datos del grado al resultado final
+        result[grade] = {
+            totalStudentCount,
+            totalAgreePercentages,
+            totalAgreeAndNotSurePercentages,
+        };
+    }
+
+    return result;
+}
+
+  
+
+async getSubjectReportWithTeacher(id: number) {
+  // Obtener la lista de conjuntos y la cantidad de estudiantes para cada conjunto
+  const sets = await this.prisma.set.findMany({
+      where: {
+          subject_id: id,
+          teacher_by_set: {
+              some: {
+                  is_primary_teacher: true,
+              },
+          },
+      },
+      include: {
+          set_list: {
+              select: {
+                  student_id: true,
+              },
+          },
+          teacher_by_set: {
+              where: {
+                  is_primary_teacher: true,
+              },
+              select: {
+                  teacher: {
+                      select: {
+                          staff_id: true,
+                          full_name: true,
+                      },
+                  },
+              },
+          },
+      },
+  });
+
+  // Crear un array para almacenar el resultado final
+  const result = [];
+
+  // Recorrer cada conjunto y calcular la cantidad de estudiantes y los porcentajes de encuestas
+  for (const set of sets) {
+      const setCode = set.set_code;
+      const studentCount = set.set_list?.length || 0; // Verificar si set_list existe antes de acceder a su longitud
+
+      // Obtener la lista de profesores para el conjunto actual
+      const teachers = set.teacher_by_set.map((teacherBySet) => ({
+          staff_id: teacherBySet.teacher.staff_id,
+          full_name: teacherBySet.teacher.full_name,
+      }));
+
+      // Obtener los conteos de respuestas de cada pregunta por profesor
+      for (const teacher of teachers) {
+          const teacherSurveyReport = [];
+
+          for (let i = 1; i <= 5; i++) {
+            const agreeCounts = await this.prisma.survey_teacher_question_answer.aggregate({
+              where: {
+                  survey_teacher_question: {
+                      survey_teacher: {
+                          teacher_id: teacher.staff_id // Filtrar por el ID del profesor
+                      },
+                      question_id: i,
+                  },
+                  answer: {
+                      in: ["Agree"],
+                  },
+              },
+              _count: {
+                  answer: true,
+              },
+          });
+          
+          const agreeAndNotSureCounts = await this.prisma.survey_teacher_question_answer.aggregate({
+              where: {
+                  survey_teacher_question: {
+                      survey_teacher: {
+                          teacher_id: teacher.staff_id // Filtrar por el ID del profesor
+                      },
+                      question_id: i,
+                  },
+                  answer: {
+                      in: ["Agree", "Not Sure"],
+                  },
+              },
+              _count: {
+                  answer: true,
+              },
+          });
+
+              const totalAgree = agreeCounts._count.answer;
+              const totalAgreeAndNotSure = agreeAndNotSureCounts._count.answer;
+
+              const totalAgreePercentage = (totalAgree / studentCount) * 100;
+              const totalAgreeAndNotSurePercentage = (totalAgreeAndNotSure / studentCount) * 100;
+
+              teacherSurveyReport.push({
+                  questionId: i,
+                  totalAgreePercentage,
+                  totalAgreeAndNotSurePercentage,
+              });
+          }
+
+          // Agregar la información del profesor y sus respuestas al resultado final
+          result.push({
+              setCode,
+              studentCount,
+              teacher: {
+                  staff_id: teacher.staff_id,
+                  full_name: teacher.full_name,
+              },
+              surveyReport: teacherSurveyReport,
+          });
+      }
+  }
+
+  return result;
+}
+
+
+
+  
   async getSubjectReport(id: number) {
     // Obtener la lista de sets y la cantidad de estudiantes
     const sets = await this.prisma.set.findMany({
@@ -123,10 +320,7 @@ export class ReportService {
           totalAgreeAndNotSurePercentage
         });
       }
-
-      
     }
-  
     return result;
   }
 

@@ -31,3 +31,11 @@ export class CreateSurveyAnswerAndRelationDto{
     }
 
 
+export class CreateSurveyTriggerDto{
+    @ApiProperty()
+    @IsNumber()
+    survey_id: number;
+    @ApiProperty({ type: [Number] })
+    @IsArray()
+    student_has_survey: Array<number>;
+}

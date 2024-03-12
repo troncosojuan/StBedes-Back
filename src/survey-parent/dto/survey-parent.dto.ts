@@ -30,3 +30,12 @@ export class CreateSurveyParentAnswerAndRelationDto{
     @ApiProperty()
     createSurveyParentAnswerDto: CreateSurveyParentAnswerDto[];
 }
+
+export class CreateSurveyParentTriggerDto{
+    @ApiProperty()
+    @IsNumber()
+    survey_parent_id: number;
+    @ApiProperty({ type: [Number] })
+    @IsArray()
+    student_has_survey_parent: Array<number>;
+}

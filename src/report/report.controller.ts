@@ -14,9 +14,22 @@ export class ReportController {
     return this.reportService.generateReport(res);
   }
 
+  @Get("get-subject-report")
+  @ApiResponse({ status: 200, description: "Report generated successfully" })
+  async getWholeSubjectReport() { // Use the Response type for the res parameter
+    return this.reportService.getWholeCollegeResponses();
+  }
+
   @Get("get-subject-report-by-subject/:id")
   @ApiResponse({ status: 200, description: "Report generated successfully" })
   async getSubjectReport(@Param("id") id:number ) { // Use the Response type for the res parameter
-    return this.reportService.getSubjectReport(id);
+    const subjectReport = await this.reportService.getSubjectReport(id);
+    const subjectReportWithTeacher = await this.reportService.getSubjectReportWithTeacher(id);
+
+    return {subjectReport, subjectReportWithTeacher};
   }
+
+  
+
+  
 }

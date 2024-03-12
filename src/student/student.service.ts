@@ -17,6 +17,8 @@ export class StudentService {
         await this.prisma.student.createMany({
             data: createStudentDto
         });
+
+        
     }
 
     async createStudentByYear(createStudentDto: CreateStudentByYearDto[]) {

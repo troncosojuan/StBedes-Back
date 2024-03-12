@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateSurveyTeacherAnswerAndRelationDto, CreateSurveyTeacherDto } from './dto/survey-teacher.dto';
+import { CreateSurveyTeacherAnswerAndRelationDto, CreateSurveyTeacherDto, CreateSurveyTeacherTriggerDto } from './dto/survey-teacher.dto';
 
 @Injectable()
 export class SurveyTeacherService {
+
 
     constructor(private readonly prisma: PrismaService) { }
 
@@ -69,8 +70,8 @@ export class SurveyTeacherService {
         return surveys;
     }
 
-     // hacer que sean solo los profesores
-     async getTeacherListByStudent(id: number) {
+    // hacer que sean solo los profesores
+    async getTeacherListByStudent(id: number) {
         const student = await this.prisma.student.findFirst({
             where: {
                 student_id: id
@@ -113,9 +114,12 @@ export class SurveyTeacherService {
         return teachers;
     }
 
+
     async createSurveyTeacher(data: CreateSurveyTeacherDto[]) {
+        const createdSurveyTeacherIds: { survey_teacher_id: number, set_id: number, teacher_id: number }[] = [];
+
         for (const surveyData of data) {
-            await this.prisma.survey_teacher.create({
+            const createdSurveyTeacher = await this.prisma.survey_teacher.create({
                 data: {
                     set_id: surveyData.set_id,
                     teacher_id: surveyData.teacher_id,
@@ -135,7 +139,15 @@ export class SurveyTeacherService {
                     }
                 }
             });
+
+            createdSurveyTeacherIds.push({
+                survey_teacher_id: createdSurveyTeacher.survey_teacher_id,
+                set_id: createdSurveyTeacher.set_id,
+                teacher_id: createdSurveyTeacher.teacher_id
+            });
         }
+
+        return createdSurveyTeacherIds;
     }
 
     async createTeacherAnswer(data: CreateSurveyTeacherAnswerAndRelationDto) {
@@ -153,4 +165,16 @@ export class SurveyTeacherService {
         });
     }
 
+    async createSurveyTeacherTrigger(data: CreateSurveyTeacherTriggerDto[]) {
+        for (const surveyData of data) {
+            await this.prisma.student_has_survey_teacher.createMany({
+                data: surveyData.student_has_survey_teacher.map(studentId => ({
+                    student_id: studentId,
+                    survey_teacher_id: surveyData.survey_teacher_id
+                }
+                ))
+            })
+        }
+    }
 }
+

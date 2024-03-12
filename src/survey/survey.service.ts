@@ -1,14 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateSurveyAnswerAndRelationDto, CreateSurveyAnswerDto, CreateSurveyDto } from './dto/createSurvey.dto';
+import { CreateSurveyAnswerAndRelationDto, CreateSurveyAnswerDto, CreateSurveyDto, CreateSurveyTriggerDto } from './dto/createSurvey.dto';
 
 @Injectable()
 export class SurveyService {
+   
 
 
     constructor(private readonly prisma: PrismaService) { }
-
-
 
     async getSurveyByStudent() {
         const surveys = await this.prisma.survey_question.findMany({
@@ -30,8 +29,6 @@ export class SurveyService {
         });
         return surveys;
     }
-
-
 
 
     async createAnswer(data: CreateSurveyAnswerAndRelationDto) {
@@ -72,13 +69,11 @@ export class SurveyService {
         }
     }
 
-
-
-
-
     async createSurvey(data: CreateSurveyDto[]) {
+        const createdSurveyIds: number[] = []; // Array para almacenar los IDs creados
+
         for (const surveyData of data) {
-            await this.prisma.survey.create({
+            const createdSurvey = await this.prisma.survey.create({
                 data: {
                     survey_question: {
                         createMany: {
@@ -96,13 +91,13 @@ export class SurveyService {
                     }
                 }
             });
+
+            // Almacenar el ID del survey creado en el array
+            createdSurveyIds.push(createdSurvey.survey_id);
         }
+
+        return createdSurveyIds; // Devolver el array de IDs
     }
-
-
-
-
-
 
     async getSurveyByStudentId(id: number) {
         const survey = await this.prisma.student.findFirst({
@@ -128,9 +123,17 @@ export class SurveyService {
     }
 
 
-
-
-
+    async createSurveyTrigger(data: CreateSurveyTriggerDto[]) {
+        for (const surveyData of data) {
+            await this.prisma.student_has_survey.createMany({
+                data: surveyData.student_has_survey.map(studentId => ({
+                    student_id: studentId,
+                    survey_id: surveyData.survey_id
+                }
+                ))
+            })
+        }
+    }
 
 
 }
