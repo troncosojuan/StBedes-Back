@@ -12,6 +12,7 @@ export class SurveyService {
     async getSurveyByStudent() {
         const surveys = await this.prisma.survey_question.findMany({
             select: {
+                id: true,
                 question: {
                     select: {
                         section: true,
@@ -109,11 +110,6 @@ export class SurveyService {
                     select: {
                         id: true,
                         is_answered: true,
-                        survey: {
-                            select: {
-                                survey_id: true,
-                            }
-                        }
                     }
                 }
             }
