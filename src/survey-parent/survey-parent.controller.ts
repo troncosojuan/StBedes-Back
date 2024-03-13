@@ -31,7 +31,7 @@ export class SurveyParentController {
     @Post("add-survey-parent")
     @ApiResponse({ status: 200, description: "Survey parent created successfully" })
     async createSurveyParent(@Body() data: CreateSurveyParentDto[]) {
-        await this.surveyParentService.createSurveyParent(data);
+        return await this.surveyParentService.createSurveyParent(data);
     }
 
     @Post("add-answer-parent")

@@ -31,7 +31,7 @@ export class SurveyTeacherController {
     @Post("add-survey-teacher")
     @ApiResponse({ status: 201, description: "Survey teacher created successfully" })
     async createSurveyTeacher(@Body() data: CreateSurveyTeacherDto[]) {
-        await this.surveyTeacherService.createSurveyTeacher(data);
+        return await this.surveyTeacherService.createSurveyTeacher(data);
     }
 
     @Post("add-answer-teacher")

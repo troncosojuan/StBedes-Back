@@ -24,7 +24,7 @@ export class SurveyController {
     @Post("add-survey")
     @ApiResponse({ status: 201, description: "Survey created successfully" })
     async createSurvey(@Body() data: CreateSurveyDto[]) {
-        await this.surveyService.createSurvey(data);
+       return await this.surveyService.createSurvey(data);
     }
 
     @Post("add-answer")
