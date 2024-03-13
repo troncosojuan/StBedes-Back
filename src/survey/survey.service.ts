@@ -97,7 +97,7 @@ export class SurveyService {
             createdSurveyIds.push(createdSurvey.survey_id);
         }
 
-        return createdSurveyIds; // Devolver el array de IDs
+        return {surveyId: createdSurveyIds} // Devolver el array de IDs
     }
 
     async getSurveyByStudentId(id: number) {

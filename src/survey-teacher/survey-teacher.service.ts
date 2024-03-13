@@ -147,7 +147,7 @@ export class SurveyTeacherService {
             });
         }
 
-        return createdSurveyTeacherIds;
+        return {createdSurveyTeacher: createdSurveyTeacherIds};
     }
 
     async createTeacherAnswer(data: CreateSurveyTeacherAnswerAndRelationDto) {

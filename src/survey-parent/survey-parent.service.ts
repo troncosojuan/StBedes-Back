@@ -149,7 +149,7 @@ export class SurveyParentService {
             createdSurveyParentIds.push(createdSurveyParent.survey_parent_id);
         }
     
-        return { survey_parent_id: createdSurveyParentIds }; // Devolver el array de IDs
+        return { surveyParentId: createdSurveyParentIds }; // Devolver el array de IDs
     }
 
     async createParentAnswer(data: CreateSurveyParentAnswerAndRelationDto) {
