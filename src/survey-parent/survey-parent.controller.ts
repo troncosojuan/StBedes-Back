@@ -29,20 +29,20 @@ export class SurveyParentController {
 
 
     @Post("add-survey-parent")
-    @ApiResponse({ status: 200, description: "Survey parent created successfully" })
+    @ApiResponse({ status: 201, description: "Survey parent created successfully" })
     async createSurveyParent(@Body() data: CreateSurveyParentDto[]) {
         return await this.surveyParentService.createSurveyParent(data);
     }
 
     @Post("add-answer-parent")
-    @ApiResponse({ status: 200, description: "Survey parent answer created successfully" })
+    @ApiResponse({ status: 201, description: "Survey parent answer created successfully" })
     async createParentAnswer(@Body() data: CreateSurveyParentAnswerAndRelationDto) {
         await this.surveyParentService.createParentAnswer(data);
     }
 
 
     @Post("add-survey-parent-trigger")
-    @ApiResponse({ status: 200, description: "Survey parent trigger created successfully" })
+    @ApiResponse({ status: 201, description: "Survey parent trigger created successfully" })
     async createSurveyParentTrigger(@Body() data: CreateSurveyParentTriggerDto[]) {
         await this.surveyParentService.createSurveyParentTrigger(data);
     }

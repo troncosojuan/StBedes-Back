@@ -169,7 +169,7 @@ export class SurveyParentService {
 
     async createSurveyParentTrigger(data: CreateSurveyParentTriggerDto[]) {
         for (const surveyData of data) {
-            this.prisma.student_has_survey_parent.createMany({
+            await this.prisma.student_has_survey_parent.createMany({
                 data: surveyData.student_has_survey_parent.map(studentId => ({
                     student_id: studentId,
                     survey_parent_id: surveyData.survey_parent_id

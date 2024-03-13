@@ -7,7 +7,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 @Injectable()
 export class ReportService {
 
-
   constructor(private readonly prisma: PrismaService) { }
 
 
@@ -94,7 +93,7 @@ export class ReportService {
           const agreeCounts = await this.prisma.survey_teacher_question_answer.aggregate({
             where: {
               survey_teacher_question: {
-                question_id:{
+                question_id: {
                   in: [1, 2, 3, 4, 5],
                 }
               },
@@ -369,5 +368,260 @@ export class ReportService {
     }
     return result;
   }
+
+  async getTeacherReport(id: number) {
+    //Obtener las materias que el maestro está enseñando
+    const subjects = await this.prisma.set.findMany({
+      where: {
+        teacher_by_set: {
+          some: {
+            teacher_id: id,
+          },
+        },
+      },
+      include: {
+        subject: true,
+      },
+    });
+    // Obtener la lista de conjuntos (sets) en los que el maestro está enseñando la materia
+    const sets = await this.prisma.set.findMany({
+      where: {
+
+        subject_id: {
+          in: subjects.map((subject) => subject.subject_id),
+        },
+        set_list: {
+          some: {
+            student_id: {
+              not: null,
+            },
+          }
+        },
+      },
+        include: {
+          subject: true, // Incluir la información de la materia
+          year_group: true,
+          set_list: true,
+          // Incluir la información del grado
+        },
+      });
+
+    // Crear un objeto para almacenar el resultado final, donde cada clave es el nombre de la materia
+    const result = {};
+
+    // Recorrer cada conjunto y obtener la cantidad total de estudiantes y el set_code
+    for (const set of sets) {
+      const setCode = set.set_code;
+      const subjectName = set.subject.subject_name; // Nombre de la materia
+      const yearGroupName = set.year_group.name; // Nombre del grado
+      const yearGroupId = set.year_group.year_id; // ID del grado
+
+      // Verificar si el año del grado está dentro del rango del 7 al 13
+      if (yearGroupId >= 7 && yearGroupId <= 13) {
+        const studentCount = set.set_list.length; // Cantidad total de estudiantes
+
+        // Calcular los porcentajes de respuestas "Agree" y "Agree and Not Sure" por conjunto
+        const totalAgreeCounts = Array(5).fill(0);
+        const totalAgreeAndNotSureCounts = Array(5).fill(0);
+
+        for (let i = 1; i <= 5; i++) {
+          const agreeCounts = await this.prisma.survey_teacher_question_answer.aggregate({
+            where: {
+              survey_teacher_question: {
+                question_id: i,
+                survey_teacher: {
+                  set: {
+                    set_code: setCode,
+                  },
+                },
+              },
+              answer: {
+                in: ["Agree"],
+              },
+            },
+            _count: {
+              answer: true,
+            },
+          });
+
+          const agreeAndNotSureCounts = await this.prisma.survey_teacher_question_answer.aggregate({
+            where: {
+              survey_teacher_question: {
+                question_id: i,
+                survey_teacher: {
+                  set: {
+                    set_code: setCode,
+                  },
+                },
+              },
+              answer: {
+                in: ["Agree", "Not sure"],
+              },
+            },
+            _count: {
+              answer: true,
+            },
+          });
+
+          totalAgreeCounts[i - 1] += agreeCounts._count.answer;
+          totalAgreeAndNotSureCounts[i - 1] += agreeAndNotSureCounts._count.answer;
+        }
+
+        const totalAgreePercentages = totalAgreeCounts.map((count) => (count / studentCount) * 100);
+        const totalAgreeAndNotSurePercentages = totalAgreeAndNotSureCounts.map((count) => (count / studentCount) * 100);
+
+        // Si aún no existe una entrada para esta materia en el resultado, crear una nueva entrada
+        if (!result[subjectName]) {
+          result[subjectName] = [];
+        }
+
+        // Agregar la información al array correspondiente a esta materia
+        result[subjectName].push({
+          yearGroupName,
+          setCode,
+          studentCount,
+          totalAgreePercentages,
+          totalAgreeAndNotSurePercentages,
+        });
+      }
+    }
+
+    return result;
+  }
+
+  async getTeacherReportWithSubject(id: number) {
+    // Obtener información del profesor
+    const teacher = await this.prisma.teacher.findFirst({
+      where: {
+        staff_id: id,
+      },
+      select: {
+        full_name: true,
+      },
+    });
+
+    if (!teacher) {
+      throw new Error("Teacher not found");
+    }
+
+    const teacherFullName = teacher.full_name;
+
+    // Obtener la lista de conjuntos (sets) en los que el maestro está enseñando la materia
+    const sets = await this.prisma.set.findMany({
+      where: {
+        teacher_by_set: {
+          some: {
+            teacher_id: id, // Filtrar por el ID del maestro
+          },
+        },
+      },
+      include: {
+        subject: true, // Incluir la información de la materia
+        year_group: true,
+        set_list: true,
+        // Incluir la información del grado
+      },
+    });
+
+    // Crear un objeto para almacenar el resultado final, donde cada clave es el nombre de la materia
+    const result = {};
+
+    // Recorrer cada conjunto y obtener la cantidad total de estudiantes y el set_code
+    for (const set of sets) {
+      const setCode = set.set_code;
+      const subjectName = set.subject.subject_name; // Nombre de la materia
+      const yearGroupName = set.year_group.name; // Nombre del grado
+      const yearGroupId = set.year_group.year_id; // ID del grado
+
+      // Verificar si el año del grado está dentro del rango del 7 al 13
+      if (yearGroupId >= 7 && yearGroupId <= 13) {
+        const studentCount = set.set_list.length; // Cantidad total de estudiantes
+
+        // Si aún no existe una entrada para esta materia en el resultado, crear una nueva entrada
+        if (!result[subjectName]) {
+          result[subjectName] = {
+            teacher: teacherFullName, // Nombre completo del profesor
+            totalStudentCount: 0, // Inicializar el contador de estudiantes
+            sets: [], // Array para almacenar información de los conjuntos
+          };
+        }
+
+        // Incrementar el contador de estudiantes total para esta materia
+        result[subjectName].totalStudentCount += studentCount;
+
+        // Calcular los porcentajes de las respuestas de las encuestas
+        const surveyResults = await this.calculateSurveyResults(setCode, studentCount);
+
+        // Agregar información del conjunto al array correspondiente a esta materia
+        result[subjectName].sets.push({
+          yearGroupName,
+          setCode,
+          studentCount,
+          surveyResults,
+        });
+      }
+    }
+
+    return result;
+  }
+
+  async calculateSurveyResults(setCode: string, studentCount: number) {
+    const result = [];
+
+    for (let i = 1; i <= 5; i++) {
+      const agreeCounts = await this.prisma.survey_teacher_question_answer.aggregate({
+        where: {
+          survey_teacher_question: {
+            survey_teacher: {
+              set: {
+                set_code: setCode,
+              },
+            },
+            question_id: i,
+          },
+          answer: {
+            in: ["Agree"],
+          },
+        },
+        _count: {
+          answer: true,
+        },
+      });
+
+      const agreeAndNotSureCounts = await this.prisma.survey_teacher_question_answer.aggregate({
+        where: {
+          survey_teacher_question: {
+            survey_teacher: {
+              set: {
+                set_code: setCode,
+              },
+            },
+            question_id: i,
+          },
+          answer: {
+            in: ["Agree", "Not sure"],
+          },
+        },
+        _count: {
+          answer: true,
+        },
+      });
+
+      const totalAgree = agreeCounts._count.answer;
+      const totalAgreePercentage = (totalAgree / studentCount) * 100;
+      const totalAgreeAndNotSure = agreeAndNotSureCounts._count.answer;
+      const totalAgreeAndNotSurePercentage = (totalAgreeAndNotSure / studentCount) * 100;
+
+      result.push({
+        questionId: i,
+        totalAgreePercentage,
+        totalAgreeAndNotSurePercentage,
+      });
+    }
+
+    return result;
+  }
+
+
 
 }
