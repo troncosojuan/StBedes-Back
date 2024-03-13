@@ -123,7 +123,7 @@ export class SurveyParentService {
     }
 
     async createSurveyParent(data: CreateSurveyParentDto[]) {
-        const createdSurveyParentIds: number[] = []; // Array para almacenar los IDs creados
+        const createdSurveyParentIds: any[] = []; // Array para almacenar los IDs creados
     
         for (const surveyData of data) {
             const createdSurveyParent = await this.prisma.survey_parent.create({
@@ -146,7 +146,7 @@ export class SurveyParentService {
             });
     
             // Almacenar el ID del survey_parent creado en el array
-            createdSurveyParentIds.push(createdSurveyParent.survey_parent_id);
+            createdSurveyParentIds.push({survey_parent_id: createdSurveyParent.survey_parent_id});
         }
     
         return createdSurveyParentIds; // Devolver el array de IDs
@@ -167,7 +167,7 @@ export class SurveyParentService {
         });
     }
 
-    createSurveyParentTrigger(data: CreateSurveyParentTriggerDto[]) {
+    async createSurveyParentTrigger(data: CreateSurveyParentTriggerDto[]) {
         for (const surveyData of data) {
             this.prisma.student_has_survey_parent.createMany({
                 data: surveyData.student_has_survey_parent.map(studentId => ({
