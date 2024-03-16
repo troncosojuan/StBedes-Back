@@ -8,11 +8,6 @@ import { ApiResponse, ApiTags } from '@nestjs/swagger';
 export class ReportController {
   constructor(private readonly reportService: ReportService) {}
 
-  @Get("generate-report")
-  @ApiResponse({ status: 200, description: "Report generated successfully" })
-  async generateReport(@Res() res: Response<any, Record<string, any>>) { // Use the Response type for the res parameter
-    return this.reportService.generateReport(res);
-  }
 
   @Get("get-subject-report")
   @ApiResponse({ status: 200, description: "Report generated successfully" })
