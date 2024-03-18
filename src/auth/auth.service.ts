@@ -1,10 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { userInfo } from 'os';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { LoginUserStudentDto } from './dto/user.dto';
+import { LoginUserDto, LoginUserStudentDto } from './dto/user.dto';
 
 @Injectable()
 export class AuthService {
+
 
     constructor(private readonly prisma: PrismaService) {}
 
@@ -20,4 +21,33 @@ export class AuthService {
     }
 
   }
+
+  async loginParent(data: LoginUserDto) {
+    const user = await this.prisma.parent.findFirst({
+        where: {
+            email_address: data.email,
+            password: data.password
+        }
+        });
+
+        if (!user) {
+            throw new NotFoundException('Parent not found');
+          }
+  }
+
+
+  async loginStudent(data: LoginUserDto) {
+    const user = await this.prisma.student.findFirst({
+        where: {
+            email_address: data.email,
+            password: data.password
+        }
+        });
+
+        if (!user) {
+            throw new NotFoundException('Student not found');
+          }
+  }
+
+
 }

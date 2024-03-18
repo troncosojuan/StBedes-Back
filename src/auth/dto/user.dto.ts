@@ -6,3 +6,14 @@ export class LoginUserStudentDto {
     @IsString()
     email_address: string;
 }
+
+export class LoginUserDto{
+    @ApiProperty()
+    @IsString()
+    email: string;
+    @ApiProperty()
+    @IsString()
+    password: string;
+}
+
+
