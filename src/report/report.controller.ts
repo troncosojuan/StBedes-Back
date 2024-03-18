@@ -31,7 +31,7 @@ export class ReportController {
     const teacherReport = await this.reportService.getTeacherReport(id);
     // const teacherReportWithSubject = await this.reportService.getTeacherReportWithSubject(id);
 
-    return {teacherReport};
+    return teacherReport;
   }
 
   

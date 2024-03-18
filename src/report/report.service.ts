@@ -349,36 +349,35 @@ export class ReportService {
 
   async getTeacherReport(id: number) {
     const subjects = await this.prisma.set.findMany({
-      where: {
-        teacher_by_set: {
-          some: {
-            teacher_id: id,
-          },
-        },
-        year_id: {
-          in: [7, 8, 9, 10, 11, 12, 13],
-        },
-      },
       select: {
-        year_id: true,
         set_code: true,
-        year_group: {
-          select: {
-            name: true,
-          },
-        },
+        set_id: true,
         subject: {
           select: {
             subject_id: true,
             subject_name: true,
-          }
+          },
+          where: {
+            set: {
+              some: {
+                year_id: {
+                  in: [7, 8, 9, 10, 11, 12, 13],
+                },
+              }
+            },
+            
+          },
+
         },
+        
+
       }
-      });
+    },
+    );
 
-    return subjects
-
+    return subjects;
   }
+
 
 
   //   const totalAgree = await this.prisma.survey_teacher_question_answer.aggregate({
