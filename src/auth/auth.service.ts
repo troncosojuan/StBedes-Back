@@ -50,7 +50,7 @@ export class AuthService {
         }
 
         const userDto = plainToClass(StudentDto, user);
-
+        
         return userDto;
     }
 

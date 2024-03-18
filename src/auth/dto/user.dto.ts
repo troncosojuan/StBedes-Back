@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { Exclude } from "class-transformer";
 import { IsString } from "class-validator";
 
 export class LoginUserStudentDto {
@@ -56,6 +57,11 @@ export class StudentDto{
     @ApiProperty()
     @IsString()
     enrolment_school_year: string;
+    @Exclude()
+    password: string;
+
+    @Exclude()
+    created_at: string;
 }
 
 
