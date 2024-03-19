@@ -348,34 +348,129 @@ export class ReportService {
 
 
   async getTeacherReport(id: number) {
-    const subjects = await this.prisma.set.findMany({
-      select: {
-        set_code: true,
-        set_id: true,
+    const sets = await this.prisma.set.findMany({
+      where: {
         subject: {
-          select: {
-            subject_id: true,
-            subject_name: true,
-          },
-          where: {
-            set: {
-              some: {
-                year_id: {
-                  in: [7, 8, 9, 10, 11, 12, 13],
+          set: {
+            some: {
+              teacher_by_set: {
+                some: {
+                  teacher_id: id,
+                  is_primary_teacher: true,
                 },
+              },
+              survey_teacher: {
+                some: {
+                  student_has_survey_teacher: {
+                    some: {
+                      is_answered: true
+                    }
+                  }
+                }
               }
             },
-            
           },
-
         },
-        
+        year_id: {
+          in: [7, 8, 9, 10, 11, 12],
+        },
+        survey_teacher: {
+          some: {
+            student_has_survey_teacher: {
+              some: {
+                is_answered: true
+              }
+            }
+          }
+        }
+      },
+      select: {
+        set_code: true,
+        year_group: {
+          select: {
+            name: true
+          }
+        },
+        subject: {
+          select: {
+            subject_name: true,
+          },
+        },
+      },
+      distinct: ['set_code'],
+    });
 
+    const result = {};
+
+    for (const set of sets) {
+      const totalStudentSurveyed = await this.prisma.student_has_survey_teacher.aggregate({
+        where: {
+          survey_teacher: {
+            set: {
+              set_code: set.set_code,
+            },
+          },
+          is_answered: true,
+        },
+        _count: true,
+      });
+
+      const questionResults = [];
+
+      for (let i = 1; i <= 5; i++) {
+        const totalAgree = await this.prisma.survey_teacher_question_answer.aggregate({
+          where: {
+            survey_teacher_question: {
+              survey_teacher: {
+                set: {
+                  set_code: set.set_code,
+                },
+              },
+              question_id: i,
+            },
+            answer: {
+              equals: "Agree",
+            },
+          },
+          _count: true,
+        });
+
+        const totalAgreeAndNotSure = await this.prisma.survey_teacher_question_answer.aggregate({
+          where: {
+            survey_teacher_question: {
+              survey_teacher: {
+                set: {
+                  set_code: set.set_code,
+                },
+              },
+              question_id: i,
+            },
+            answer: {
+              in: ["Agree", "Not sure"],
+            },
+          },
+          _count: true,
+        });
+
+        questionResults.push({
+          questionId: i,
+          totalAgree: (totalAgree._count / totalStudentSurveyed._count) * 100,
+          totalAgreeAndNotSure: (totalAgreeAndNotSure._count / totalStudentSurveyed._count) * 100
+        });
       }
-    },
-    );
 
-    return subjects;
+      if (!result[set.subject.subject_name]) {
+        result[set.subject.subject_name] = [];
+      }
+
+      result[set.subject.subject_name].push({
+        yearName: set.year_group.name,
+        totalStudentSurveyed: totalStudentSurveyed._count,
+        questionResults,
+      });
+    }
+
+    return result;
   }
 
 
