@@ -28,13 +28,13 @@ export class ReportController {
   @Get("get-teacher-report-by-teacher/:id")
   @ApiResponse({ status: 200, description: "Report generated successfully" })
   async getTeacherReport(@Param("id") id:number) { // Use the Response type for the res parameter
-    const teacherReport = await this.reportService.getTeacherReport(id);
-    // const teacherReportWithSubject = await this.reportService.getTeacherReportWithSubject(id);
+    // const teacherReport = await this.reportService.getTeacherReport(id);
+    const teacherReportWithSubject = await this.reportService.getTeacherReportWithSubject(id);
 
-    return teacherReport;
+    return teacherReportWithSubject;
   }
 
   
-
+  
   
 }
