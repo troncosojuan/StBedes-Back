@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginUserDto, LoginUserStudentDto } from './dto/user.dto';
@@ -11,8 +11,10 @@ export class AuthController {
 
   @Post("login")
   @ApiResponse({ status: 200, description: "User logged in successfully" })
+  @ApiResponse({ status: 404, description: "User not found" })
   async login(@Body() data: LoginUserStudentDto) {
-    return await this.authService.login(data);
+      await this.authService.login(data);
+ 
   }
 
   @Post("login-student")

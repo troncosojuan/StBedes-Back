@@ -16,11 +16,10 @@ export class AuthService {
                 email_address: data.email_address
             }
         });
-
-        if (!userInfo) {
-            new NotFoundException('User not found');
+ 
+        if(!userInfo) {
+            throw new NotFoundException('User not found');
         }
-
     }
 
     async loginParent(data: LoginUserDto) {
