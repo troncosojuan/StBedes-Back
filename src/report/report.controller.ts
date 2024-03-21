@@ -14,7 +14,7 @@ export class ReportController {
     return await this.reportService.getWholeCollegeResponses();
   }
 
-  @Get("get-subject-report")
+  @Get("get-subject-report/:id")
   @ApiResponse({ status: 200, description: "Report generated successfully" })
   async getSubjectReport(@Param("id") id: number) {
     return await this.reportService.getSubjectReport(id);
@@ -26,7 +26,7 @@ export class ReportController {
     return await this.reportService.getSubjectReportWithTeacher(id);
   }
 
-  @Get("get-teacher-report")
+  @Get("get-teacher-report/:id")
   @ApiResponse({ status: 200, description: "Report generated successfully" })
   async getTeacherReport(@Param("id") id: number) {
     return await this.reportService.getTeacherReport(id)
