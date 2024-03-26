@@ -158,6 +158,11 @@ export class ReportService {
       },
       select: {
         set_code: true,
+        year_group: {
+          select: {
+            name: true,
+          },
+        },
         teacher_by_set: {
           select: {
             teacher: {
@@ -239,6 +244,7 @@ export class ReportService {
   
       result[teacherName].push({
         setCode: set.set_code,
+        yearName: set.year_group.name,
         totalStudentSurveyed: totalStudentSurveyed._count,
         questionResults,
       });
