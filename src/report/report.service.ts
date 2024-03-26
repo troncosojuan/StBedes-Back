@@ -191,9 +191,9 @@ export class ReportService {
         },
         _count: true,
       });
-  
+
       const questionResults = [];
-  
+
       for (let i = 1; i <= 5; i++) {
         const totalAgree = await this.prisma.survey_teacher_question_answer.aggregate({
           where: {
@@ -211,7 +211,7 @@ export class ReportService {
           },
           _count: true,
         });
-  
+
         const totalAgreeAndNotSure = await this.prisma.survey_teacher_question_answer.aggregate({
           where: {
             survey_teacher_question: {
@@ -228,20 +228,20 @@ export class ReportService {
           },
           _count: true,
         });
-  
+
         questionResults.push({
           questionId: i,
           totalAgree: Math.round((totalAgree._count / totalStudentSurveyed._count) * 100),
           totalAgreeAndNotSure: Math.round((totalAgreeAndNotSure._count / totalStudentSurveyed._count) * 100)
         });
       }
-  
+
       const teacherName = set.teacher_by_set[0].teacher.full_name;
-  
+
       if (!result[teacherName]) {
         result[teacherName] = [];
       }
-  
+
       result[teacherName].push({
         setCode: set.set_code,
         yearName: set.year_group.name,
@@ -249,140 +249,140 @@ export class ReportService {
         questionResults,
       });
     }
-  
+
 
     return result;
 
 
 
-    
+
   }
 
   async getSubjectReport(id: number) {
     // Obtener los conjuntos relacionados con el ID del tema
     const sets = await this.prisma.set.findMany({
-        where: {
-            year_id: {
-                in: [7, 8, 9, 10, 11, 12, 13],
-            },
-            subject: {
-                subject_id: id,
-            },
-            survey_teacher: {
-                some: {
-                    student_has_survey_teacher: {
-                        some: {
-                            is_answered: true
-                        }
-                    }
-                }
-            }
+      where: {
+        year_id: {
+          in: [7, 8, 9, 10, 11, 12, 13],
         },
-        select: {
-            year_group: {
-                select: {
-                    name: true,
-                },
-            },
-            set_code: true,
+        subject: {
+          subject_id: id,
         },
-        orderBy: {
-            year_group: {
-                name: 'asc'
+        survey_teacher: {
+          some: {
+            student_has_survey_teacher: {
+              some: {
+                is_answered: true
+              }
             }
+          }
         }
+      },
+      select: {
+        year_group: {
+          select: {
+            name: true,
+          },
+        },
+        set_code: true,
+      },
+      orderBy: {
+        year_group: {
+          name: 'asc'
+        }
+      }
     });
 
     const result = {};
 
     // Obtener el nombre del tema una vez
     const subject = await this.prisma.subject.findFirst({
-        where: {
-            subject_id: id,
-        },
-        select: {
-            subject_name: true,
-        },
+      where: {
+        subject_id: id,
+      },
+      select: {
+        subject_name: true,
+      },
     });
 
     for (const set of sets) {
-        const totalStudentSurveyed = await this.prisma.student_has_survey_teacher.aggregate({
-            where: {
-                survey_teacher: {
-                    set: {
-                        set_code: set.set_code,
-                    },
-                },
-                is_answered: true,
+      const totalStudentSurveyed = await this.prisma.student_has_survey_teacher.aggregate({
+        where: {
+          survey_teacher: {
+            set: {
+              set_code: set.set_code,
             },
-            _count: true,
+          },
+          is_answered: true,
+        },
+        _count: true,
+      });
+
+      const questionResults = [];
+
+      for (let i = 1; i <= 5; i++) {
+        const totalAgree = await this.prisma.survey_teacher_question_answer.aggregate({
+          where: {
+            survey_teacher_question: {
+              survey_teacher: {
+                set: {
+                  set_code: set.set_code,
+                },
+              },
+              question_id: i,
+            },
+            answer: {
+              equals: "Agree",
+            },
+          },
+          _count: true,
         });
 
-        const questionResults = [];
-
-        for (let i = 1; i <= 5; i++) {
-            const totalAgree = await this.prisma.survey_teacher_question_answer.aggregate({
-                where: {
-                    survey_teacher_question: {
-                        survey_teacher: {
-                            set: {
-                                set_code: set.set_code,
-                            },
-                        },
-                        question_id: i,
-                    },
-                    answer: {
-                        equals: "Agree",
-                    },
+        const totalAgreeAndNotSure = await this.prisma.survey_teacher_question_answer.aggregate({
+          where: {
+            survey_teacher_question: {
+              survey_teacher: {
+                set: {
+                  set_code: set.set_code,
                 },
-                _count: true,
-            });
+              },
+              question_id: i,
+            },
+            answer: {
+              in: ["Agree", "Not sure"],
+            },
+          },
+          _count: true,
+        });
 
-            const totalAgreeAndNotSure = await this.prisma.survey_teacher_question_answer.aggregate({
-                where: {
-                    survey_teacher_question: {
-                        survey_teacher: {
-                            set: {
-                                set_code: set.set_code,
-                            },
-                        },
-                        question_id: i,
-                    },
-                    answer: {
-                        in: ["Agree", "Not sure"],
-                    },
-                },
-                _count: true,
-            });
+        questionResults.push({
+          questionId: i,
+          totalAgree: Math.round((totalAgree._count / totalStudentSurveyed._count) * 100),
+          totalAgreeAndNotSure: Math.round((totalAgreeAndNotSure._count / totalStudentSurveyed._count) * 100)
+        });
+      }
 
-            questionResults.push({
-                questionId: i,
-                totalAgree: Math.round((totalAgree._count / totalStudentSurveyed._count) * 100),
-                totalAgreeAndNotSure: Math.round((totalAgreeAndNotSure._count / totalStudentSurveyed._count) * 100)
-            });
-        }
+      const yearGroupName = set.year_group.name;
 
-        const yearGroupName = set.year_group.name;
+      if (!result[yearGroupName]) {
+        result[yearGroupName] = {
+          totalStudentSurveyed: 0,
+          questionResults: []
+        };
+      }
 
-        if (!result[yearGroupName]) {
-            result[yearGroupName] = {
-                totalStudentSurveyed: 0,
-                questionResults: []
-            };
-        }
-
-        result[yearGroupName].totalStudentSurveyed += totalStudentSurveyed._count;
-        result[yearGroupName].questionResults = questionResults;
+      result[yearGroupName].totalStudentSurveyed += totalStudentSurveyed._count;
+      result[yearGroupName].questionResults = questionResults;
     }
 
     // Agregar el nombre del tema al principio
     const formattedResult = {
-        [`${subject.subject_name}`]: result
+      [`${subject.subject_name}`]: result
     };
 
     return formattedResult;
-}
-  
+  }
+
 
   async getTeacherReport(id: number) {
     const sets = await this.prisma.set.findMany({
@@ -641,7 +641,7 @@ export class ReportService {
 
       result[teacherName.full_name].push({
         setCode: set.set_code,
-        yearName: set.subject.subject_name,
+        yearName: set.year_group.name,
         totalStudentSurveyed: totalStudentSurveyed._count,
         questionResults,
       });
@@ -649,9 +649,5 @@ export class ReportService {
 
     return result;
   }
-
-
-
-
 
 }
