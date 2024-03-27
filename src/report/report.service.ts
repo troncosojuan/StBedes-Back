@@ -255,6 +255,14 @@ export class ReportService {
   }
 
   async getSubjectReport(id: number) {
+    const subject= await this.prisma.subject.findFirst({
+      where: {
+        subject_id: id,
+      },
+      select: {
+        subject_name: true,
+      },
+    });
 
     const yearGroups = await this.prisma.year_group.findMany({
       select: {
@@ -304,7 +312,9 @@ export class ReportService {
 
 
 
-    const result = {};
+    const result = {
+      subject: subject.subject_name,
+    };
 
     for (const year of yearGroups) {
       result[year.name] = {
