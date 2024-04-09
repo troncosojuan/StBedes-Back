@@ -8,6 +8,14 @@ export class ReportController {
   constructor(private readonly reportService: ReportService) { }
 
 
+  @Get("get-teacher-report-pdf")
+  @ApiResponse({ status: 200, description: "Report generated successfully" })
+  async getTeacherReportPdf(@Res() res: any) {
+    const reportBuffer = await this.reportService.getTeacherReportPDF();
+    res.setHeader('Content-Type', 'application/pdf');
+    res.send(reportBuffer);
+  }
+
   @Get("get-whole-college-report")
   @ApiResponse({ status: 200, description: "Report generated successfully" })
   async getWholeSubjectReport() {
