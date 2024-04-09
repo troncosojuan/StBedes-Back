@@ -15,13 +15,21 @@ export class ReportService {
 
   async getTeacherReportPDF(): Promise<Buffer> {
     const wholeCollegeResponses = await this.getWholeCollegeResponses();
-    console.dir(wholeCollegeResponses, { depth: null });
+    // console.dir(wholeCollegeResponses, { depth: null });
+    const teacherReportResponses = await this.getTeacherReport(22)
+    // console.dir(teacherReportResponses, { depth: null })
+    const teacherReportWithTeacherResponses = await this.getTeacherReportWithSubject(22)
+    // console.dir(teacherReportWithTeacherResponses, {depth: null})
+    const subjectName = Object.keys(teacherReportResponses)[0];
+    const gradesInfo = teacherReportResponses[subjectName]
+
     const pdfBuffer: Buffer = await new Promise(async resolve => {
       const doc = new PDFDocument(
         {
           size: "LETTER",
           bufferPages: true,
           autoFirstPage: false,
+          margin: 72,
         })
 
       let pageNumber = 0;
@@ -74,7 +82,7 @@ export class ReportService {
       doc.fontSize(12);
 
 
-      doc.font("Helvetica-Bold").text("Homework ", { continued: true, indent: indentSize }).font("Helvetica").text("- I find homework is worthwhile and helps me become more confident in the subject", { indent: indentSize, width: doc.page.width - 100 });
+      doc.font("Helvetica-Bold").text("Homework ", { continued: true }).font("Helvetica").text("- I find homework is worthwhile and helps me become more confident in the subject", { width: 400, align: "center"});
       doc.moveDown(0.5);
       doc.font("Helvetica-Bold").text("Feedback ", { continued: true, indent: indentSize }).font("Helvetica").text("- My teacher gives me regular feedback (either verbal or written) and I know what I need to do to improve", { indent: indentSize });
       doc.moveDown(0.5);
@@ -89,29 +97,27 @@ export class ReportService {
       doc.text('', 50, 70);
       doc.moveDown();
       doc.font("Helvetica-Bold").fontSize(32);
-      doc.text("Whole College Responses",{underline:true});
+      doc.text("Whole College Responses", { underline: true });
       doc.moveDown();
       //TODO: Tabla de whole college responses
 
 
       let rows = [];
-      Object.entries(wholeCollegeResponses).forEach(([yearGroup, data]) => {
-        const responseData = data as { questions: any[], studentSurveyed: number }; // Update type assertion to include 'studentSurveyed' property
-        responseData.questions.forEach((question, index) => {
-          // Cada pregunta se convierte en dos filas: una para TotalAgree y otra para TotalAgreeAndNotSure
-          if(index === 0) {
-            // Agrega la primera fila con el nombre del grupo de años y TotalAgree
-            rows.push([yearGroup, responseData.studentSurveyed.toString(), 'TotalAgree', question.totalAgree]);
-            // Agrega la segunda fila con TotalAgreeAndNotSure
-            rows.push(['', '', 'TotalAgreeAndNotSure', question.totalAgreeAndNotSure]);
-          } else {
-            // Solo agrega las respuestas para las filas subsecuentes sin repetir el grupo de años y studentSurveyed
-            rows.push(['', '', 'TotalAgree', question.totalAgree]);
-            rows.push(['', '', 'TotalAgreeAndNotSure', question.totalAgreeAndNotSure]);
-          }
+      Object.entries(wholeCollegeResponses).forEach(([yearGroup, data]: [string, { studentSurveyed: number; questions: { agreePercentage: number; agreeAndNotSurePercentage: number; }[] }]) => {
+        // Asumiendo que data.questions siempre tiene exactamente 5 preguntas, como en el ejemplo dado.
+        const totalAgreeRow = [yearGroup, data.studentSurveyed.toString(), 'Agree'];
+        const totalAgreeAndNotSureRow = ['', '', 'Agree and Not sure'];
+
+        data.questions.forEach(question => {
+          totalAgreeRow.push(`${question.agreePercentage}%`);
+          totalAgreeAndNotSureRow.push(`${question.agreeAndNotSurePercentage}%`);
         });
+
+        // Agregar las filas al arreglo de filas.
+        rows.push(totalAgreeRow);
+        rows.push(totalAgreeAndNotSureRow);
       });
-      
+
       // Definir la tabla para pdfkit-table
       const tableWholeCollage = {
         title: "Whole College Responses",
@@ -119,11 +125,131 @@ export class ReportService {
         headers: ['Year Group', 'Student Surveyed', 'Answer', 'Question 1', 'Question 2', 'Question 3', 'Question 4', 'Question 5'],
         rows: rows
       };
-      
+
       // Agregar la tabla al documento
       doc.table(tableWholeCollage, {
         columnsSize: [100, 60, 100, 50, 50, 50, 50, 50],
       });
+
+      doc.moveDown(4);
+
+      // Tabla de teacher Report
+      Object.entries(teacherReportResponses).forEach(([subject, yearGroups]) => {
+        // Crear una tabla para cada materia
+        let rows = [];
+        Object.entries(yearGroups).forEach(([yearGroup, data]) => {
+          const totalAgreeRow = [yearGroup, data.studentSurveyed.toString(), 'Agree'];
+          const totalAgreeAndNotSureRow = ['', '', 'Agree and Not sure'];
+
+          data.questions.forEach(question => {
+            totalAgreeRow.push(`${question.agreePercentage}%`);
+            totalAgreeAndNotSureRow.push(`${question.agreeAndNotSurePercentage}%`);
+          });
+
+          // Agregar las filas al arreglo de filas
+
+          rows.push(totalAgreeRow);
+          rows.push(totalAgreeAndNotSureRow);
+
+        });
+
+        // Definir la tabla para cada materia
+        const table = {
+          title: `${subject} Responses`,
+          subtitle: "A breakdown of student responses per year group",
+          headers: ['Year Group', 'Student Surveyed', 'Answer', 'Question 1', 'Question 2', 'Question 3', 'Question 4', 'Question 5'],
+          rows: rows
+        };
+
+
+        // Agregar la tabla al documento
+        doc.table(table, {
+          columnsSize: [100, 60, 100, 50, 50, 50, 50, 50],
+        });
+
+        // Agregar algo de espacio después de cada tabla antes de la siguiente
+        doc.moveDown(2);
+      });
+
+      doc.addPage();
+      doc.text('', 50, 70);
+
+
+      // Tabla de profesores con el nombre de profesor como titulo
+
+      Object.entries(teacherReportWithTeacherResponses).forEach(([teacherName, sets]) => {
+        let rows = [];
+        (sets as any[]).forEach(set => {
+          const totalAgreeRow = [set.setCode, set.totalStudentSurveyed.toString(), 'Agree'];
+          const totalAgreeAndNotSureRow = ['', '', 'Agree And NotSure'];
+
+          set.questionResults.forEach(question => {
+            totalAgreeRow.push(`${question.totalAgree}%`);
+            totalAgreeAndNotSureRow.push(`${question.totalAgreeAndNotSure}%`);
+          });
+
+
+          rows.push(totalAgreeRow);
+          rows.push(totalAgreeAndNotSureRow);
+          //Agregar los datos de los datos de la materia por year group, al arreglo de filas que coincida con los datos de la materia
+
+          // Object.entries(teacherReportResponses).forEach(([subject, yearGroups]) => {
+          //   Object.entries(yearGroups).forEach(([yearGroup, data]) => {
+          //     if (yearGroup === set.yearName) {
+          //       const totalAgreeRow = [yearGroup, data.studentSurveyed.toString(), 'TotalAgree'];
+          //       const totalAgreeAndNotSureRow = ['', '', 'TotalAgreeAndNotSure'];
+
+          //       data.questions.forEach(question => {
+          //         totalAgreeRow.push(`${question.agreePercentage}%`);
+          //         totalAgreeAndNotSureRow.push(`${question.agreeAndNotSurePercentage}%`);
+          //       });
+          //     }
+
+          //     rows.push(totalAgreeRow);
+          //     rows.push(totalAgreeAndNotSureRow);
+          for (const gradeName in gradesInfo) {
+            if (gradeName !== 'subject' && gradeName === set.yearName) {
+              const gradeData = gradesInfo[gradeName];
+              const totalSurveyed = gradeData.studentSurveyed
+              const questionResults = gradeData.questions
+              console.log(questionResults)
+
+              const totalAgreeRowGrade = [gradeName, totalSurveyed.toString(), 'Agree'];
+              const totalAgreeAndNotSureRowGrade = ['', '', 'Agree And NotSure'];
+
+              questionResults.forEach(question => {
+                totalAgreeRowGrade.push(question.agreePercentage.toString() + '%');
+                totalAgreeAndNotSureRowGrade.push(question.agreeAndNotSurePercentage.toString() + '%');
+              });
+
+              rows.push(totalAgreeRowGrade);
+              rows.push(totalAgreeAndNotSureRowGrade);
+            }
+
+          }
+
+        }
+        )
+
+        // Agregar las filas al arreglo de filas        
+
+
+
+        const table = {
+          title: `${teacherName} Responses`,
+          subtitle: "A breakdown of student responses per year group",
+          headers: ['Year Group', 'Student Surveyed', 'Answer', 'Question 1', 'Question 2', 'Question 3', 'Question 4', 'Question 5'],
+          rows: rows
+        };
+
+        doc.table(table, {
+          columnsSize: [100, 60, 100, 50, 50, 50, 50, 50],
+        });
+
+        doc.moveDown(2);
+      });
+
+
 
 
       const buffer = []
@@ -186,6 +312,9 @@ export class ReportService {
           }
         },
       },
+      orderBy: {
+        year_id: "asc"
+      }
     });
 
     const result = {};
@@ -556,8 +685,8 @@ export class ReportService {
                   some: {
                     is_answered: true
                   }
-                }
-              }
+                },
+              },
             }
           },
         },
@@ -612,6 +741,9 @@ export class ReportService {
             }
           },
         },
+        orderBy: {
+          year_id: "asc"
+        }
       });
 
       const result = {};
