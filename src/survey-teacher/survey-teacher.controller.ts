@@ -40,6 +40,12 @@ export class SurveyTeacherController {
         await this.surveyTeacherService.createTeacherAnswer(data);
     }
 
+    @Post("add-answers-teacher")
+    @ApiResponse({ status: 201, description: "Survey teacher answers created successfully" })
+    async createTeacherAnswers(@Body() data: CreateSurveyTeacherAnswerAndRelationDto[]) {
+        await this.surveyTeacherService.createManyTeacherAnswers(data);
+    }
+
     @Post("add-survey-teacher-trigger")
     @ApiResponse({ status: 201, description: "Survey teacher trigger created successfully" })
     async createSurveyTeacherTrigger(@Body() data: CreateSurveyTeacherTriggerDto[]) {

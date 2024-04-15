@@ -22,16 +22,16 @@ export class CreateSurveyDto {
     student_has_survey: Array<number>;
 }
 
-export class CreateSurveyAnswerAndRelationDto{
-        @ApiProperty()
-        @IsNumber()
-        student_has_survey_id: number;
-        @ApiProperty()
-        createSurveyAnswerDto: CreateSurveyAnswerDto[];
-    }
+export class CreateSurveyAnswerAndRelationDto {
+    @ApiProperty()
+    @IsNumber()
+    student_has_survey_id: number;
+    @ApiProperty()
+    createSurveyAnswerDto: CreateSurveyAnswerDto[];
+}
 
 
-export class CreateSurveyTriggerDto{
+export class CreateSurveyTriggerDto {
     @ApiProperty()
     @IsNumber()
     survey_id: number;

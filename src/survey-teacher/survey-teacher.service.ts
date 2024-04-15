@@ -4,6 +4,7 @@ import { CreateSurveyTeacherAnswerAndRelationDto, CreateSurveyTeacherDto, Create
 
 @Injectable()
 export class SurveyTeacherService {
+    
 
 
     constructor(private readonly prisma: PrismaService) { }
@@ -174,6 +175,12 @@ export class SurveyTeacherService {
                 }
                 ))
             })
+        }
+    }
+
+    async createManyTeacherAnswers(data: CreateSurveyTeacherAnswerAndRelationDto[]) {
+        for (const answerData of data) {
+            await this.createTeacherAnswer(answerData);
         }
     }
 }
