@@ -13,8 +13,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: "User logged in successfully" })
   @ApiResponse({ status: 404, description: "User not found" })
   async login(@Body() data: LoginUserStudentDto) {
-      await this.authService.login(data);
- 
+      return await this.authService.login(data);
   }
 
   @Post("login-student")
