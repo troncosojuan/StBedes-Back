@@ -21,7 +21,9 @@ export class AuthService {
             throw new NotFoundException('User not found');
         }
 
-        return userInfo;
+        const userDto = plainToClass(StudentDto, userInfo);
+
+        return userDto;
     }
 
     async loginParent(data: LoginUserDto) {
