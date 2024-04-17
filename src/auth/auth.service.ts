@@ -20,6 +20,8 @@ export class AuthService {
         if(!userInfo) {
             throw new NotFoundException('User not found');
         }
+
+        return userInfo;
     }
 
     async loginParent(data: LoginUserDto) {
