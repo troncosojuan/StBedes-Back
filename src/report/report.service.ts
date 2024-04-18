@@ -46,7 +46,7 @@ export class ReportService {
         doc.page.margins.bottom = 0;
         doc.font("Helvetica").fontSize(14);
         doc.text(
-          'Pág. ' + pageNumber,
+          'Page. ' + pageNumber,
           0.5 * (doc.page.width - 100),
           doc.page.height - 50,
           {
@@ -311,7 +311,7 @@ export class ReportService {
         doc.page.margins.bottom = 0;
         doc.font("Helvetica").fontSize(14);
         doc.text(
-          'Pág. ' + pageNumber,
+          'Page. ' + pageNumber,
           0.5 * (doc.page.width - 100),
           doc.page.height - 50,
           {
@@ -332,7 +332,7 @@ export class ReportService {
         underline: "true"
       });
       doc.moveDown(1);
-      doc.text("Teacher Report", {
+      doc.text("Subject Report", {
         width: doc.page.width,
         align: 'center',
         underline: "true"
@@ -662,7 +662,7 @@ export class ReportService {
         const studentCount = totalStudentSurveyed._count;
         studentSurveyCount += studentCount;
 
-        const studentId= await this.prisma.student_has_survey_teacher.findMany({
+        const studentId = await this.prisma.student_has_survey_teacher.findMany({
           where: {
             survey_teacher: {
               set: {
@@ -715,7 +715,7 @@ export class ReportService {
             },
             _count: true,
           });
-          
+
           const agreePercentage = totalAgree._count
           const agreeAndNotSurePercentage = totalAgreeAndNotSure._count
 
@@ -725,7 +725,6 @@ export class ReportService {
       }
 
       studentSurveyedArray = studentSurveyedArray.flat()
-      console.log(studentSurveyedArray)
 
       const uniqueStudentSurveyedArray = studentSurveyedArray.filter((item, index, array) => {
         // Verificar si el índice actual es igual al índice de la primera ocurrencia del objeto en el array
@@ -736,8 +735,8 @@ export class ReportService {
 
       // Calcular los porcentajes promedio por pregunta
       result[year.name].questions.forEach(question => {
-        question.agreePercentage = Math.round((question.agreePercentage / studentSurveyCount * 100));
-        question.agreeAndNotSurePercentage = Math.round((question.agreeAndNotSurePercentage / studentSurveyCount * 100));
+        question.agreePercentage = Math.round((question.agreePercentage * 100) / studentSurveyCount);
+        question.agreeAndNotSurePercentage = Math.round((question.agreeAndNotSurePercentage * 100) / studentSurveyCount);
       });
     }
 
