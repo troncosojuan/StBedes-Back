@@ -26,6 +26,13 @@ export class SurveyService {
                         }
                     }
                 },
+            },
+            where: {
+                survey:{
+                    created_at: {
+                        gte: new Date('2024-04-05')
+                    }
+                }
             }
         });
         return surveys;
