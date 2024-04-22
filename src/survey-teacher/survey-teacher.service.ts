@@ -4,7 +4,7 @@ import { CreateSurveyTeacherAnswerAndRelationDto, CreateSurveyTeacherDto, Create
 
 @Injectable()
 export class SurveyTeacherService {
-    
+
 
 
     constructor(private readonly prisma: PrismaService) { }
@@ -12,7 +12,8 @@ export class SurveyTeacherService {
     async getSurveyQuestionBySurveyId(id: number) {
         const surveyQuestions = await this.prisma.survey_teacher_question.findMany({
             where: {
-                survey_teacher_id: id
+                survey_teacher_id: id,
+                is_included: true
             },
             select: {
                 survey_teacher_question_id: true,
@@ -38,7 +39,17 @@ export class SurveyTeacherService {
     async getSurveysTeacherByStudent(id: number) {
         const surveys = await this.prisma.student.findFirst({
             where: {
-                student_id: id
+                student_id: id,
+                student_has_survey_teacher: {
+                    some: {
+                        survey_teacher: {
+                            // tenemos que buscar las encuestas del 5 de abril en adelante
+                            created_at: {
+                                gte: new Date('2024-04-05')
+                            }
+                        }
+                    }
+                },
             },
             select: {
                 student_has_survey_teacher: {
@@ -48,6 +59,7 @@ export class SurveyTeacherService {
                         survey_teacher: {
                             select: {
                                 survey_teacher_id: true,
+                                
                                 teacher: {
                                     select: {
                                         full_name: true
@@ -62,7 +74,15 @@ export class SurveyTeacherService {
                                         }
                                     }
                                 }
-                            },
+                            }
+                        }
+
+                    },
+                    where: {
+                        survey_teacher: {
+                            created_at: {
+                                gte: new Date('2024-04-05')
+                            }
                         }
                     }
                 }
@@ -148,7 +168,7 @@ export class SurveyTeacherService {
             });
         }
 
-        return {createdSurveyTeacher: createdSurveyTeacherIds};
+        return { createdSurveyTeacher: createdSurveyTeacherIds };
     }
 
     async createTeacherAnswer(data: CreateSurveyTeacherAnswerAndRelationDto) {
