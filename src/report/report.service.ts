@@ -21,6 +21,14 @@ export class ReportService {
     const wholeCollegeResponses = await this.getWholeCollegeResponses();
     const teacherReportResponses = await this.getTeacherReport(id)
     const teacherReportWithTeacherResponses = await this.getTeacherReportWithSubject(id)
+    const teacherName = await this.prisma.teacher.findFirst({
+      where: {
+        staff_id: id
+      },
+      select: {
+        full_name: true
+      }
+    })
 
     const pdfBuffer: Buffer = await new Promise(async resolve => {
       const doc = new PDFDocument(
@@ -72,6 +80,13 @@ export class ReportService {
         align: 'center',
         underline: "true"
       });
+      doc.moveDown(1);
+      doc.text(teacherName.full_name, {
+        width: doc.page.width,
+        align: 'center',
+        underline: "true"
+      }
+      )
 
       doc.addPage()
 
@@ -337,6 +352,13 @@ export class ReportService {
         align: 'center',
         underline: "true"
       });
+      doc.moveDown(1);
+      doc.text(subjectReportResponses.subject, {
+        width: doc.page.width,
+        align: 'center',
+        underline: "true"
+      }
+      )
 
       doc.addPage()
 
@@ -569,6 +591,9 @@ export class ReportService {
           where: {
             survey_teacher: {
               some: {
+                created_at: {
+                  lte: new Date('2024-03-05'),
+                },
                 student_has_survey_teacher: {
                   some: {
                     is_answered: true,
@@ -589,7 +614,9 @@ export class ReportService {
                 },
                 survey_teacher: {
                   some: {
-
+                    created_at: {
+                      lte: new Date('2024-03-05'),
+                    },
                     student_has_survey_teacher: {
                       some: {
                         is_answered: true,
@@ -612,6 +639,9 @@ export class ReportService {
                 year_id: 13,
                 survey_teacher: {
                   some: {
+                    created_at: {
+                      lte: new Date('2024-03-05'),
+                    },
                     student_has_survey_teacher: {
                       some: {
                         is_answered: true,
@@ -650,6 +680,9 @@ export class ReportService {
         const totalStudentSurveyed = await this.prisma.student_has_survey_teacher.aggregate({
           where: {
             survey_teacher: {
+              created_at: {
+                lte: new Date('2024-03-05'),
+              },
               set: {
                 set_code: set.set_code,
               },
@@ -665,6 +698,9 @@ export class ReportService {
         const studentId = await this.prisma.student_has_survey_teacher.findMany({
           where: {
             survey_teacher: {
+              created_at: {
+                lte: new Date('2024-03-05'),
+              },
               set: {
                 set_code: set.set_code,
               },
@@ -686,6 +722,9 @@ export class ReportService {
             where: {
               survey_teacher_question: {
                 survey_teacher: {
+                  created_at: {
+                    lte: new Date('2024-03-05'),
+                  },
                   set: {
                     set_code: set.set_code,
                   },
@@ -703,6 +742,9 @@ export class ReportService {
             where: {
               survey_teacher_question: {
                 survey_teacher: {
+                  created_at: {
+                    lte: new Date('2024-03-05'),
+                  },
                   set: {
                     set_code: set.set_code,
                   },
@@ -757,6 +799,9 @@ export class ReportService {
             },
             survey_teacher: {
               some: {
+                created_at: {
+                  lte: new Date('2024-03-05'),
+                },
                 student_has_survey_teacher: {
                   some: {
                     is_answered: true,
@@ -772,6 +817,9 @@ export class ReportService {
             },
             survey_teacher: {
               some: {
+                created_at: {
+                  lte: new Date('2024-03-05'),
+                },
                 student_has_survey_teacher: {
                   some: {
                     is_answered: true,
@@ -809,6 +857,9 @@ export class ReportService {
       const totalStudentSurveyed = await this.prisma.student_has_survey_teacher.aggregate({
         where: {
           survey_teacher: {
+            created_at: {
+              lte: new Date('2024-03-05'),
+            },
             set: {
               set_code: set.set_code,
             },
@@ -825,6 +876,9 @@ export class ReportService {
           where: {
             survey_teacher_question: {
               survey_teacher: {
+                created_at: {
+                  lte: new Date('2024-03-05'),
+                },
                 set: {
                   set_code: set.set_code,
                 },
@@ -842,6 +896,9 @@ export class ReportService {
           where: {
             survey_teacher_question: {
               survey_teacher: {
+                created_at: {
+                  lte: new Date('2024-03-05'),
+                },
                 set: {
                   set_code: set.set_code,
                 },
@@ -903,6 +960,9 @@ export class ReportService {
             },
             survey_teacher: {
               some: {
+                created_at: {
+                  lte: new Date('2024-03-05'),
+                },
                 student_has_survey_teacher: {
                   some: {
                     is_answered: true,
@@ -926,6 +986,9 @@ export class ReportService {
                 },
                 survey_teacher: {
                   some: {
+                    created_at: {
+                      lte: new Date('2024-03-05'),
+                    },
                     student_has_survey_teacher: {
                       some: {
                         is_answered: true,
@@ -945,6 +1008,9 @@ export class ReportService {
                 },
                 survey_teacher: {
                   some: {
+                    created_at: {
+                      lte: new Date('2024-03-05'),
+                    },
                     student_has_survey_teacher: {
                       some: {
                         is_answered: true,
@@ -983,6 +1049,9 @@ export class ReportService {
         const totalStudentSurveyed = await this.prisma.student_has_survey_teacher.aggregate({
           where: {
             survey_teacher: {
+              created_at: {
+                lte: new Date('2024-03-05'),
+              },
               set: {
                 set_code: set.set_code,
               },
@@ -1000,6 +1069,9 @@ export class ReportService {
             where: {
               survey_teacher_question: {
                 survey_teacher: {
+                  created_at: {
+                    lte: new Date('2024-03-05'),
+                  },
                   set: {
                     set_code: set.set_code,
                   },
@@ -1017,6 +1089,9 @@ export class ReportService {
             where: {
               survey_teacher_question: {
                 survey_teacher: {
+                  created_at: {
+                    lte: new Date('2024-03-05'),
+                  },
                   set: {
                     set_code: set.set_code,
                   },
@@ -1071,6 +1146,9 @@ export class ReportService {
                 },
                 survey_teacher: {
                   some: {
+                    created_at: {
+                      lte: new Date('2024-03-05'),
+                    },
                     student_has_survey_teacher: {
                       some: {
                         is_answered: true
@@ -1092,6 +1170,9 @@ export class ReportService {
                 },
                 survey_teacher: {
                   some: {
+                    created_at: {
+                      lte: new Date('2024-03-05'),
+                    },
                     student_has_survey_teacher: {
                       some: {
                         is_answered: true
@@ -1123,6 +1204,9 @@ export class ReportService {
               },
               survey_teacher: {
                 some: {
+                  created_at: {
+                    lte: new Date('2024-03-05'),
+                  },
                   student_has_survey_teacher: {
                     some: {
                       is_answered: true,
@@ -1146,6 +1230,9 @@ export class ReportService {
                   },
                   survey_teacher: {
                     some: {
+                      created_at: {
+                        lte: new Date('2024-03-05'),
+                      },
                       student_has_survey_teacher: {
                         some: {
                           is_answered: true,
@@ -1171,6 +1258,9 @@ export class ReportService {
                   },
                   survey_teacher: {
                     some: {
+                      created_at: {
+                        lte: new Date('2024-03-05'),
+                      },
                       student_has_survey_teacher: {
                         some: {
                           is_answered: true,
@@ -1212,6 +1302,9 @@ export class ReportService {
           const totalStudentSurveyed = await this.prisma.student_has_survey_teacher.aggregate({
             where: {
               survey_teacher: {
+                created_at: {
+                  lte: new Date('2024-03-05'),
+                },
                 set: {
                   set_code: set.set_code,
                 },
@@ -1229,6 +1322,9 @@ export class ReportService {
               where: {
                 survey_teacher_question: {
                   survey_teacher: {
+                    created_at: {
+                      lte: new Date('2024-03-05'),
+                    },
                     set: {
                       set_code: set.set_code,
                     },
@@ -1246,6 +1342,9 @@ export class ReportService {
               where: {
                 survey_teacher_question: {
                   survey_teacher: {
+                    created_at: {
+                      lte: new Date('2024-03-05'),
+                    },
                     set: {
                       set_code: set.set_code,
                     },
@@ -1290,6 +1389,9 @@ export class ReportService {
           },
           survey_teacher: {
             some: {
+              created_at: {
+                lte: new Date('2024-03-05'),
+              },
               teacher_id: id,
               student_has_survey_teacher: {
                 some: {
@@ -1310,6 +1412,9 @@ export class ReportService {
           },
           survey_teacher: {
             some: {
+              created_at: {
+                lte: new Date('2024-03-05'),
+              },
               teacher_id: id,
               student_has_survey_teacher: {
                 some: {
@@ -1354,6 +1459,9 @@ export class ReportService {
       const totalStudentSurveyed = await this.prisma.student_has_survey_teacher.aggregate({
         where: {
           survey_teacher: {
+            created_at: {
+              lte: new Date('2024-03-05'),
+            },
             set: {
               set_code: set.set_code,
             },
@@ -1370,6 +1478,9 @@ export class ReportService {
           where: {
             survey_teacher_question: {
               survey_teacher: {
+                created_at: {
+                  lte: new Date('2024-03-05'),
+                },
                 set: {
                   set_code: set.set_code,
                 },
@@ -1387,6 +1498,9 @@ export class ReportService {
           where: {
             survey_teacher_question: {
               survey_teacher: {
+                created_at: {
+                  lte: new Date('2024-03-05'),
+                },
                 set: {
                   set_code: set.set_code,
                 },

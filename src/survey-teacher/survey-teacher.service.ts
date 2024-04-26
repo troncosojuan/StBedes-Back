@@ -62,7 +62,10 @@ export class SurveyTeacherService {
                                 
                                 teacher: {
                                     select: {
-                                        full_name: true
+                                        full_name: true,
+                                        surname: true,
+                                        forename: true,
+                                        title: true
                                     }
                                 },
                                 set: {
