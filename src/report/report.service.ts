@@ -1,43 +1,36 @@
 import { Injectable } from '@nestjs/common';
-import { Response } from 'express';
 const PDFDocument = require('pdfkit-table');
 import { PrismaService } from 'src/prisma/prisma.service';
 
 import { join, resolve } from 'path';
-import { text } from 'stream/consumers';
-import { dir, group } from 'console';
-import { distinct } from 'rxjs';
-
 
 @Injectable()
 export class ReportService {
 
-
-
   constructor(private readonly prisma: PrismaService) { }
 
-
-  async getTeacherReportPDF(id: number): Promise<Buffer> {
+  async getTeacherReportPDF(id: number): Promise<{ buffer: Buffer; fileName: string }> {
     const wholeCollegeResponses = await this.getWholeCollegeResponses();
     const teacherReportResponses = await this.getTeacherReport(id)
     const teacherReportWithTeacherResponses = await this.getTeacherReportWithSubject(id)
+
     const teacherName = await this.prisma.teacher.findFirst({
       where: {
         staff_id: id
       },
       select: {
-        full_name: true
+        title: true,
+        surname: true,
       }
     })
 
-    const pdfBuffer: Buffer = await new Promise(async resolve => {
-      const doc = new PDFDocument(
-        {
-          size: "LETTER",
-          bufferPages: true,
-          autoFirstPage: false,
-          margin: 50,
-        })
+    const pdfBuffer: Buffer = await new Promise((resolve, reject) => {
+      const doc = new PDFDocument({
+        size: "LETTER",
+        bufferPages: true,
+        autoFirstPage: false,
+        margin: 50,
+      });
 
       let pageNumber = 0;
       doc.on('pageAdded', () => {
@@ -81,7 +74,14 @@ export class ReportService {
         underline: "true"
       });
       doc.moveDown(1);
-      doc.text(teacherName.full_name, {
+      doc.text(`${teacherName.title}. ${teacherName.surname}`, {
+        width: doc.page.width,
+        align: 'center',
+        underline: "true"
+      }
+      )
+      doc.moveDown(0.5)
+      doc.text("February 2024", {
         width: doc.page.width,
         align: 'center',
         underline: "true"
@@ -227,7 +227,9 @@ export class ReportService {
         for (const yearGroup in teacherReportResponses[grade]) {
 
           Object.entries(teacherReportWithTeacherResponses).forEach(([teacherName, sets]) => {
+
             let rows = [];
+
             (sets as any[]).forEach(set => {
               if (set.subject === grade) {
                 const totalAgreeRow = [set.setCode, set.totalStudentSurveyed.toString(), 'Agree'];
@@ -242,9 +244,6 @@ export class ReportService {
                 rows.push(totalAgreeRow);
                 rows.push(totalAgreeAndNotSureRow);
               }
-
-
-
             })
 
             if (yearGroup !== 'subject') {
@@ -289,11 +288,10 @@ export class ReportService {
         resolve(data)
       })
       doc.end()
-
-
     })
 
-    return pdfBuffer;
+    const fileName = `${teacherName.title}.${teacherName.surname} FEB 24.pdf`;
+  return { buffer: pdfBuffer, fileName };
   }
 
 
@@ -356,7 +354,12 @@ export class ReportService {
       doc.text(subjectReportResponses.subject, {
         width: doc.page.width,
         align: 'center',
-        underline: "true"
+      }
+      )
+      doc.moveDown(0.5)
+      doc.text("February 2024", {
+        width: doc.page.width,
+        align: 'center',
       }
       )
 
@@ -841,7 +844,8 @@ export class ReportService {
           select: {
             teacher: {
               select: {
-                full_name: true,
+                title: true,
+                surname: true,
               }
             }
           },
@@ -919,13 +923,14 @@ export class ReportService {
         });
       }
 
-      const teacherName = set.teacher_by_set[0].teacher.full_name;
+      const teacherTitle = set.teacher_by_set[0].teacher.title;
+      const teacherSurname = set.teacher_by_set[0].teacher.surname;
 
-      if (!result[teacherName]) {
-        result[teacherName] = [];
+      if (!result[teacherSurname]) {
+        result[`${teacherTitle}. ${teacherSurname}`] = [];
       }
 
-      result[teacherName].push({
+      result[`${teacherTitle}. ${teacherSurname}`].push({
         setCode: set.set_code,
         yearName: set.year_group.name,
         totalStudentSurveyed: totalStudentSurveyed._count,
@@ -1448,7 +1453,8 @@ export class ReportService {
 
     const teacherName = await this.prisma.teacher.findFirst({
       select: {
-        full_name: true,
+        title: true,
+        surname: true,
       },
       where: {
         staff_id: id
@@ -1521,11 +1527,13 @@ export class ReportService {
         });
       }
 
-      if (!result[teacherName.full_name]) {
-        result[teacherName.full_name] = [];
+      const teacherKey = teacherName.title + "." + ' ' + teacherName.surname;
+
+      if (!result[teacherKey]) {
+        result[teacherKey] = [];
       }
 
-      result[teacherName.full_name].push({
+      result[teacherKey].push({
         setCode: set.set_code,
         yearName: set.year_group.name,
         subject: set.subject.subject_name,
