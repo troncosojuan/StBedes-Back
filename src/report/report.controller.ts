@@ -21,9 +21,11 @@ export class ReportController {
   @Get("get-subject-report-pdf/:id")
   @ApiResponse({ status: 200, description: "Report generated successfully" })
   async getSubjectReportPdf(@Param("id") id: number,   @Res() res: any) {
-    const reportBuffer = await this.reportService.getSubjectReportPDF(id);
+    const { buffer, fileName } = await this.reportService.getSubjectReportPDF(id);
     res.setHeader('Content-Type', 'application/pdf');
-    res.send(reportBuffer);
+    res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`); // Asegura que el PDF se descargue con el nombre adecuado
+    res.setHeader('X-Filename', fileName);
+    res.send(buffer);
   }
 
 

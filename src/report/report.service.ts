@@ -291,16 +291,16 @@ export class ReportService {
     })
 
     const fileName = `${teacherName.title}.${teacherName.surname} FEB 24.pdf`;
-  return { buffer: pdfBuffer, fileName };
+    return { buffer: pdfBuffer, fileName };
   }
 
 
-  async getSubjectReportPDF(id: number): Promise<Buffer> {
+  async getSubjectReportPDF(id: number): Promise<{ buffer: Buffer; fileName: string }> {
     const wholeCollegeResponses = await this.getWholeCollegeResponses();
     const subjectReportResponses = await this.getSubjectReport(id);
     const subjectReportWithTeacherResponses = await this.getSubjectReportWithTeacher(id);
 
-    const pdfBuffer: Buffer = await new Promise(async resolve => {
+    const pdfBuffer: Buffer = await new Promise((resolve, reject) => {
       const doc = new PDFDocument(
         {
           size: "LETTER",
@@ -354,12 +354,14 @@ export class ReportService {
       doc.text(subjectReportResponses.subject, {
         width: doc.page.width,
         align: 'center',
+        underline: "true"
       }
       )
       doc.moveDown(0.5)
       doc.text("February 2024", {
         width: doc.page.width,
         align: 'center',
+        underline: "true"
       }
       )
 
@@ -566,9 +568,9 @@ export class ReportService {
           doc.text('', 50, 70);
           doc.moveDown();
         }
-
-
       }
+
+
 
 
       const buffer = []
@@ -580,7 +582,8 @@ export class ReportService {
       doc.end()
     })
 
-    return pdfBuffer;
+    const fileName = `${subjectReportResponses.subject} FEB 24.pdf`;
+    return { buffer: pdfBuffer, fileName };
   }
 
   async getWholeCollegeResponses() {
