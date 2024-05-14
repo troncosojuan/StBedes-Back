@@ -10,9 +10,16 @@ export class ReportService {
   constructor(private readonly prisma: PrismaService) { }
 
   async getTeacherReportPDF(id: number): Promise<{ buffer: Buffer; fileName: string }> {
+
+    //Setup para cargar dos tablas por hoja
+    let changePage = 0;
+    const tablesPerPageSubject = 3
+    const tablesPerPageTeacher = 2
+
     const wholeCollegeResponses = await this.getWholeCollegeResponses();
     const teacherReportResponses = await this.getTeacherReport(id)
     const teacherReportWithTeacherResponses = await this.getTeacherReportWithSubject(id)
+
 
     const teacherName = await this.prisma.teacher.findFirst({
       where: {
@@ -148,7 +155,7 @@ export class ReportService {
       doc.text("Responses", { underline: true });
       doc.moveDown(1);
 
-      //Tabla de whole college responses
+      // Tabla de whole college responses
       let rows = [];
       Object.entries(wholeCollegeResponses).forEach(([yearGroup, data]: [string, { studentSurveyed: number; questions: { agreePercentage: number; agreeAndNotSurePercentage: number; }[] }]) => {
         // Asumiendo que data.questions siempre tiene exactamente 5 preguntas, como en el ejemplo dado.
@@ -178,8 +185,12 @@ export class ReportService {
         columnsSize: [100, 60, 100, 50, 50, 50, 50, 50],
       });
 
-      doc.moveDown(4);
-      let changePage = 0;
+      doc.addPage(); // Agregar una nueva página
+      doc.text('', 50, 70);
+      doc.moveDown();
+
+
+
       // Tabla de teacher Report
       Object.entries(teacherReportResponses).forEach(([subject, yearGroups]) => {
         // Crear una tabla para cada materia
@@ -217,24 +228,36 @@ export class ReportService {
         // Agregar algo de espacio después de cada tabla antes de la siguiente
         doc.moveDown(2);
         changePage++;
-        if(changePage == 2){
-          doc.addPage()
+
+
+        // Verificar si es necesario pasar a la siguiente página
+        if (changePage % tablesPerPageSubject === 0) {
+          doc.addPage(); // Agregar una nueva página
           doc.text('', 50, 70);
-          doc.moveDown(2);
+          doc.moveDown();
         }
       });
+
+      // Agregar una nueva página para mostrar datos del teacher
+      doc.addPage();
+      doc.text('', 50, 70);
+      doc.moveDown();
+      changePage = 0;
+
 
 
 
       // Tablas de profesor con el nombre de profesor como titulo y el nombre de la materia como subtitulo
       for (const grade in teacherReportResponses) {
+        let rows = [];
+        // nombre de materia, 1 tabla por materia
         for (const yearGroup in teacherReportResponses[grade]) {
+          // yearGroup, va al final de los sets
           Object.entries(teacherReportWithTeacherResponses).forEach(([teacherName, sets]) => {
 
-            let rows = [];
 
             (sets as any[]).forEach(set => {
-              if (set.subject === grade) {
+              if (set.subject === grade && set.yearName === yearGroup) {
                 const totalAgreeRow = [set.setCode, set.totalStudentSurveyed.toString(), 'Agree'];
                 const totalAgreeAndNotSureRow = ['', '', 'Agree And Not Sure'];
 
@@ -248,43 +271,45 @@ export class ReportService {
                 rows.push(totalAgreeAndNotSureRow);
               }
             })
+          })
 
-            if (yearGroup !== 'subject') {
-              const gradeData = teacherReportResponses[grade][yearGroup];
-              const totalSurveyed = gradeData.studentSurveyed
-              const questionResults = gradeData.questions
 
-              const totalAgreeRowGrade = [yearGroup, totalSurveyed.toString(), 'Agree'];
-              const totalAgreeAndNotSureRowGrade = ['', '', 'Agree And NotSure'];
+          const gradeData = teacherReportResponses[grade][yearGroup];
+          const totalSurveyed = gradeData.studentSurveyed
+          const questionResults = gradeData.questions
 
-              questionResults.forEach(question => {
-                totalAgreeRowGrade.push(`${question.agreePercentage}%`);
-                totalAgreeAndNotSureRowGrade.push(`${question.agreeAndNotSurePercentage}%`);
-              });
+          const totalAgreeRowGrade = [yearGroup, totalSurveyed.toString(), 'Agree'];
+          const totalAgreeAndNotSureRowGrade = ['', '', 'Agree And NotSure'];
 
-              rows.push(totalAgreeRowGrade);
-              rows.push(totalAgreeAndNotSureRowGrade);
-            }
-
-            const table = {
-              title: `${teacherName} - ${grade}`,
-              headers: ['Year Group', 'Student Surveyed', 'Answer', 'Question 1', 'Question 2', 'Question 3', 'Question 4', 'Question 5'],
-
-              rows: rows
-            };
-
-            doc.table(table, {
-              columnsSize: [100, 60, 100, 50, 50, 50, 50, 50],
-            });
-
-            doc.moveDown(4);
-            if(changePage == 2){
-              doc.addPage()
-              doc.text('', 50, 70);
-              doc.moveDown(2);
-            }
+          questionResults.forEach(question => {
+            totalAgreeRowGrade.push(`${question.agreePercentage}%`);
+            totalAgreeAndNotSureRowGrade.push(`${question.agreeAndNotSurePercentage}%`);
           });
+
+          rows.push(totalAgreeRowGrade);
+          rows.push(totalAgreeAndNotSureRowGrade);
         }
+
+
+        const table = {
+          title: `${teacherName.title}. ${teacherName.surname} - ${grade}`,
+          headers: ['Year Group', 'Student Surveyed', 'Answer', 'Question 1', 'Question 2', 'Question 3', 'Question 4', 'Question 5'],
+
+          rows: rows
+        };
+
+        doc.table(table, {
+          columnsSize: [100, 60, 100, 50, 50, 50, 50, 50],
+        });
+
+        doc.moveDown(4);
+        if (changePage % tablesPerPageTeacher === 0) {
+          doc.addPage(); // Agregar una nueva página
+          doc.text('', 50, 70);
+          doc.moveDown();
+        }
+
+
       }
 
 
@@ -304,9 +329,11 @@ export class ReportService {
 
 
   async getSubjectReportPDF(id: number): Promise<{ buffer: Buffer; fileName: string }> {
-    const wholeCollegeResponses = await this.getWholeCollegeResponses();
+    // const wholeCollegeResponses = await this.getWholeCollegeResponses();
     const subjectReportResponses = await this.getSubjectReport(id);
+    console.log("subject report responses: ", subjectReportResponses)
     const subjectReportWithTeacherResponses = await this.getSubjectReportWithTeacher(id);
+    console.log("subject report with teacher responses: ", subjectReportWithTeacherResponses)
 
     const pdfBuffer: Buffer = await new Promise((resolve, reject) => {
       const doc = new PDFDocument(
@@ -435,36 +462,36 @@ export class ReportService {
       //Tabla de whole college responses
 
 
-      let rows = [];
-      Object.entries(wholeCollegeResponses).forEach(([yearGroup, data]: [string, { studentSurveyed: number; questions: { agreePercentage: number; agreeAndNotSurePercentage: number; }[] }]) => {
-        // Asumiendo que data.questions siempre tiene exactamente 5 preguntas, como en el ejemplo dado.
-        const totalAgreeRow = [yearGroup, data.studentSurveyed.toString(), 'Agree'];
-        const totalAgreeAndNotSureRow = ['', '', 'Agree and Not sure'];
+      // let rows = [];
+      // Object.entries(wholeCollegeResponses).forEach(([yearGroup, data]: [string, { studentSurveyed: number; questions: { agreePercentage: number; agreeAndNotSurePercentage: number; }[] }]) => {
+      //   // Asumiendo que data.questions siempre tiene exactamente 5 preguntas, como en el ejemplo dado.
+      //   const totalAgreeRow = [yearGroup, data.studentSurveyed.toString(), 'Agree'];
+      //   const totalAgreeAndNotSureRow = ['', '', 'Agree and Not sure'];
 
-        data.questions.forEach(question => {
-          totalAgreeRow.push(`${question.agreePercentage}%`);
-          totalAgreeAndNotSureRow.push(`${question.agreeAndNotSurePercentage}%`);
-        });
+      //   data.questions.forEach(question => {
+      //     totalAgreeRow.push(`${question.agreePercentage}%`);
+      //     totalAgreeAndNotSureRow.push(`${question.agreeAndNotSurePercentage}%`);
+      //   });
 
-        // Agregar las filas al arreglo de filas.
-        rows.push(totalAgreeRow);
-        rows.push(totalAgreeAndNotSureRow);
-      });
+      //   // Agregar las filas al arreglo de filas.
+      //   rows.push(totalAgreeRow);
+      //   rows.push(totalAgreeAndNotSureRow);
+      // });
 
-      // Definir la tabla para pdfkit-table
-      const tableWholeCollage = {
-        title: "Whole College Responses",
-        subtitle: "A breakdown of student responses per year group",
-        headers: ['Year Group', 'Student Surveyed', 'Answer', 'Question 1', 'Question 2', 'Question 3', 'Question 4', 'Question 5'],
-        rows: rows
-      };
+      // // Definir la tabla para pdfkit-table
+      // const tableWholeCollage = {
+      //   title: "Whole College Responses",
+      //   subtitle: "A breakdown of student responses per year group",
+      //   headers: ['Year Group', 'Student Surveyed', 'Answer', 'Question 1', 'Question 2', 'Question 3', 'Question 4', 'Question 5'],
+      //   rows: rows
+      // };
 
-      // Agregar la tabla al documento
-      doc.table(tableWholeCollage, {
-        columnsSize: [100, 60, 100, 50, 50, 50, 50, 50],
-      });
+      // // Agregar la tabla al documento
+      // doc.table(tableWholeCollage, {
+      //   columnsSize: [100, 60, 100, 50, 50, 50, 50, 50],
+      // });
 
-      doc.moveDown(4);
+      // doc.moveDown(4);
 
       // Tabla de teacher Report
       const subjectName = subjectReportResponses.subject
@@ -624,7 +651,7 @@ export class ReportService {
             set: {
               some: {
                 year_id: {
-                  in: [7, 8, 9, 10, 11, 12]
+                  in: [7, 8, 9, 10, 11]
                 },
                 survey_teacher: {
                   some: {
@@ -650,7 +677,9 @@ export class ReportService {
           {
             set: {
               some: {
-                year_id: 13,
+                year_id: {
+                  in: [12, 13],
+                },
                 survey_teacher: {
                   some: {
                     created_at: {
@@ -806,7 +835,7 @@ export class ReportService {
         OR: [
           {
             year_id: {
-              in: [7, 8, 9, 10, 11, 12],
+              in: [7, 8, 9, 10, 11],
             },
             subject: {
               subject_id: id,
@@ -822,10 +851,17 @@ export class ReportService {
                   }
                 }
               }
-            }
+            },
+            teacher_by_set: {
+              some: {
+                is_primary_teacher: true,
+              },
+            },
           },
           {
-            year_id: 13,
+            year_id: {
+              in: [12, 13],
+            },
             subject: {
               subject_id: id,
             },
@@ -860,14 +896,12 @@ export class ReportService {
               }
             }
           },
-          where: {
-            is_primary_teacher: true,
-          }
+          
         }
       },
     });
     const result = {};
-
+    console.log("sets: ", sets)
     for (const set of sets) {
       const totalStudentSurveyed = await this.prisma.student_has_survey_teacher.aggregate({
         where: {
@@ -995,7 +1029,7 @@ export class ReportService {
             set: {
               some: {
                 year_id: {
-                  in: [7, 8, 9, 10, 11, 12]
+                  in: [7, 8, 9, 10, 11]
                 },
                 subject: {
                   subject_id: id,
@@ -1011,14 +1045,21 @@ export class ReportService {
                       }
                     }
                   }
-                }
+                },
+                teacher_by_set: {
+                  some: {
+                    is_primary_teacher: true,
+                  },
+                },
               }
             },
           },
           {
             set: {
               some: {
-                year_id: 13,
+                year_id: {
+                  in: [12, 13],
+                },
                 subject: {
                   subject_id: id,
                 },
@@ -1152,7 +1193,7 @@ export class ReportService {
             set: {
               some: {
                 year_id: {
-                  in: [7, 8, 9, 10, 11, 12]
+                  in: [7, 8, 9, 10, 11]
                 },
                 teacher_by_set: {
                   some: {
@@ -1178,7 +1219,9 @@ export class ReportService {
           {
             set: {
               some: {
-                year_id: 13,
+                year_id: {
+                  in: [12, 13],
+                },
                 teacher_by_set: {
                   some: {
                     teacher_id: id,
@@ -1268,7 +1311,9 @@ export class ReportService {
             {
               set: {
                 some: {
-                  year_id: 12,
+                  year_id: {
+                    in: [12, 13],
+                  },
                   subject: {
                     subject_name: subject.subject_name,
                   },
@@ -1417,7 +1462,7 @@ export class ReportService {
             }
           },
           year_id: {
-            in: [7, 8, 9, 10, 11, 12],
+            in: [7, 8, 9, 10, 11],
           },
         },
         {
@@ -1439,7 +1484,9 @@ export class ReportService {
               }
             }
           },
-          year_id: 13,
+          year_id: {
+            in: [12, 13],
+          },
         },
         ]
       },
