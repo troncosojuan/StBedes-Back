@@ -3,6 +3,7 @@ const PDFDocument = require('pdfkit-table');
 import { PrismaService } from 'src/prisma/prisma.service';
 
 import { join, resolve } from 'path';
+import { groupBy } from 'rxjs';
 
 @Injectable()
 export class ReportService {
@@ -329,11 +330,10 @@ export class ReportService {
 
 
   async getSubjectReportPDF(id: number): Promise<{ buffer: Buffer; fileName: string }> {
-    // const wholeCollegeResponses = await this.getWholeCollegeResponses();
+    const wholeCollegeResponses = await this.getWholeCollegeResponses();
     const subjectReportResponses = await this.getSubjectReport(id);
-    console.log("subject report responses: ", subjectReportResponses)
     const subjectReportWithTeacherResponses = await this.getSubjectReportWithTeacher(id);
-    console.log("subject report with teacher responses: ", subjectReportWithTeacherResponses)
+
 
     const pdfBuffer: Buffer = await new Promise((resolve, reject) => {
       const doc = new PDFDocument(
@@ -462,36 +462,36 @@ export class ReportService {
       //Tabla de whole college responses
 
 
-      // let rows = [];
-      // Object.entries(wholeCollegeResponses).forEach(([yearGroup, data]: [string, { studentSurveyed: number; questions: { agreePercentage: number; agreeAndNotSurePercentage: number; }[] }]) => {
-      //   // Asumiendo que data.questions siempre tiene exactamente 5 preguntas, como en el ejemplo dado.
-      //   const totalAgreeRow = [yearGroup, data.studentSurveyed.toString(), 'Agree'];
-      //   const totalAgreeAndNotSureRow = ['', '', 'Agree and Not sure'];
+      let rows = [];
+      Object.entries(wholeCollegeResponses).forEach(([yearGroup, data]: [string, { studentSurveyed: number; questions: { agreePercentage: number; agreeAndNotSurePercentage: number; }[] }]) => {
+        // Asumiendo que data.questions siempre tiene exactamente 5 preguntas, como en el ejemplo dado.
+        const totalAgreeRow = [yearGroup, data.studentSurveyed.toString(), 'Agree'];
+        const totalAgreeAndNotSureRow = ['', '', 'Agree and Not sure'];
 
-      //   data.questions.forEach(question => {
-      //     totalAgreeRow.push(`${question.agreePercentage}%`);
-      //     totalAgreeAndNotSureRow.push(`${question.agreeAndNotSurePercentage}%`);
-      //   });
+        data.questions.forEach(question => {
+          totalAgreeRow.push(`${question.agreePercentage}%`);
+          totalAgreeAndNotSureRow.push(`${question.agreeAndNotSurePercentage}%`);
+        });
 
-      //   // Agregar las filas al arreglo de filas.
-      //   rows.push(totalAgreeRow);
-      //   rows.push(totalAgreeAndNotSureRow);
-      // });
+        // Agregar las filas al arreglo de filas.
+        rows.push(totalAgreeRow);
+        rows.push(totalAgreeAndNotSureRow);
+      });
 
-      // // Definir la tabla para pdfkit-table
-      // const tableWholeCollage = {
-      //   title: "Whole College Responses",
-      //   subtitle: "A breakdown of student responses per year group",
-      //   headers: ['Year Group', 'Student Surveyed', 'Answer', 'Question 1', 'Question 2', 'Question 3', 'Question 4', 'Question 5'],
-      //   rows: rows
-      // };
+      // Definir la tabla para pdfkit-table
+      const tableWholeCollage = {
+        title: "Whole College Responses",
+        subtitle: "A breakdown of student responses per year group",
+        headers: ['Year Group', 'Student Surveyed', 'Answer', 'Question 1', 'Question 2', 'Question 3', 'Question 4', 'Question 5'],
+        rows: rows
+      };
 
-      // // Agregar la tabla al documento
-      // doc.table(tableWholeCollage, {
-      //   columnsSize: [100, 60, 100, 50, 50, 50, 50, 50],
-      // });
+      // Agregar la tabla al documento
+      doc.table(tableWholeCollage, {
+        columnsSize: [100, 60, 100, 50, 50, 50, 50, 50],
+      });
 
-      // doc.moveDown(4);
+      doc.moveDown(4);
 
       // Tabla de teacher Report
       const subjectName = subjectReportResponses.subject
@@ -539,14 +539,18 @@ export class ReportService {
       let tableCount = 0; // Contador de tablas agregadas
 
       // Tablas de profesor con el nombre de profesor como titulo y el nombre de la materia como subtitulo
-      for (const teacherName in subjectReportWithTeacherResponses) {
-        const subject = subjectReportWithTeacherResponses[teacherName].subject
+      // Recorrer cada profesor usando staff_id como clave
+      for (const staffId in subjectReportWithTeacherResponses) {
+        const teacherData = subjectReportWithTeacherResponses[staffId];
+        const teacherName = teacherData.teacherName;  // Nombre completo del profesor
         let rows = [];
-        (subjectReportWithTeacherResponses[teacherName] as any[]).forEach(set => {
+
+
+        teacherData.sets.forEach(set => {
           const totalAgreeRow = [set.setCode, set.totalStudentSurveyed.toString(), 'Agree'];
           const totalAgreeAndNotSureRow = ['', '', 'Agree And Not Sure'];
 
-
+          // Agregar resultados de cada pregunta a las filas
           set.questionResults.forEach(question => {
             totalAgreeRow.push(`${question.totalAgree}%`);
             totalAgreeAndNotSureRow.push(`${question.totalAgreeAndNotSure}%`);
@@ -554,28 +558,28 @@ export class ReportService {
 
           rows.push(totalAgreeRow);
           rows.push(totalAgreeAndNotSureRow);
-
-          //agregar los datos de subjectReportResponses por grado
-
-          for (const yearGroup in subjectReportResponses) {
-            if (yearGroup !== 'subject' && yearGroup === set.yearName) {
-              const gradeData = subjectReportResponses[yearGroup];
-              const totalSurveyed = gradeData.studentSurveyed
-              const questionResults = gradeData.questions
-
-              const totalAgreeRowGrade = [yearGroup, totalSurveyed.toString(), 'Agree'];
-              const totalAgreeAndNotSureRowGrade = ['', '', 'Agree And Not Sure'];
-
-              questionResults.forEach(question => {
-                totalAgreeRowGrade.push(question.agreePercentage.toString() + '%');
-                totalAgreeAndNotSureRowGrade.push(question.agreeAndNotSurePercentage.toString() + '%');
-              });
-
-              rows.push(totalAgreeRowGrade);
-              rows.push(totalAgreeAndNotSureRowGrade);
-            }
-          }
         });
+        //agregar los datos de subjectReportResponses por grado
+
+        for (const yearGroup in subjectReportResponses) {
+          if (yearGroup !== 'subject' && yearGroup === teacherData.sets[0].yearName) {
+            const gradeData = subjectReportResponses[yearGroup];
+            const totalSurveyed = gradeData.studentSurveyed
+            const questionResults = gradeData.questions
+
+            const totalAgreeRowGrade = [yearGroup, totalSurveyed.toString(), 'Agree'];
+            const totalAgreeAndNotSureRowGrade = ['', '', 'Agree And Not Sure'];
+
+            questionResults.forEach(question => {
+              totalAgreeRowGrade.push(question.agreePercentage.toString() + '%');
+              totalAgreeAndNotSureRowGrade.push(question.agreeAndNotSurePercentage.toString() + '%');
+            });
+
+            rows.push(totalAgreeRowGrade);
+            rows.push(totalAgreeAndNotSureRowGrade);
+          }
+        }
+
 
         const table = {
           title: `${teacherName} `,
@@ -829,7 +833,6 @@ export class ReportService {
   }
 
   async getSubjectReportWithTeacher(id: number) {
-    // Obtener la lista de conjuntos y la cantidad de estudiantes para cada conjunto
     const sets = await this.prisma.set.findMany({
       where: {
         OR: [
@@ -893,15 +896,15 @@ export class ReportService {
               select: {
                 title: true,
                 surname: true,
-              }
-            }
+                staff_id: true,
+              },
+            },
           },
-          
-        }
-      },
+        },
+      }
     });
+
     const result = {};
-    console.log("sets: ", sets)
     for (const set of sets) {
       const totalStudentSurveyed = await this.prisma.student_has_survey_teacher.aggregate({
         where: {
@@ -919,7 +922,6 @@ export class ReportService {
       });
 
       const questionResults = [];
-
       for (let i = 1; i <= 5; i++) {
         const totalAgree = await this.prisma.survey_teacher_question_answer.aggregate({
           where: {
@@ -968,21 +970,23 @@ export class ReportService {
         });
       }
 
-      const teacherTitle = set.teacher_by_set[0].teacher.title;
-      const teacherSurname = set.teacher_by_set[0].teacher.surname;
+      const teacher = set.teacher_by_set[0].teacher;
+      const teacherKey = teacher.staff_id;  // Usar staff_id como clave
 
-      if (!result[teacherSurname]) {
-        result[`${teacherTitle}. ${teacherSurname}`] = [];
+      if (!result[teacherKey]) {
+        result[teacherKey] = {
+          teacherName: `${teacher.title}. ${teacher.surname}`,
+          sets: []
+        };
       }
 
-      result[`${teacherTitle}. ${teacherSurname}`].push({
+      result[teacherKey].sets.push({
         setCode: set.set_code,
         yearName: set.year_group.name,
         totalStudentSurveyed: totalStudentSurveyed._count,
         questionResults,
       });
     }
-
 
     return result;
   }
