@@ -179,7 +179,7 @@ export class ReportService {
       });
 
       doc.moveDown(4);
-
+      let changePage = 0;
       // Tabla de teacher Report
       Object.entries(teacherReportResponses).forEach(([subject, yearGroups]) => {
         // Crear una tabla para cada materia
@@ -216,16 +216,19 @@ export class ReportService {
 
         // Agregar algo de espacio después de cada tabla antes de la siguiente
         doc.moveDown(2);
+        changePage++;
+        if(changePage == 2){
+          doc.addPage()
+          doc.text('', 50, 70);
+          doc.moveDown(2);
+        }
       });
 
-      doc.addPage();
-      doc.text('', 50, 70);
 
 
       // Tablas de profesor con el nombre de profesor como titulo y el nombre de la materia como subtitulo
       for (const grade in teacherReportResponses) {
         for (const yearGroup in teacherReportResponses[grade]) {
-
           Object.entries(teacherReportWithTeacherResponses).forEach(([teacherName, sets]) => {
 
             let rows = [];
@@ -275,6 +278,11 @@ export class ReportService {
             });
 
             doc.moveDown(4);
+            if(changePage == 2){
+              doc.addPage()
+              doc.text('', 50, 70);
+              doc.moveDown(2);
+            }
           });
         }
       }

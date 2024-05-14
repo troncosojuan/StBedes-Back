@@ -14,15 +14,14 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -54,7 +53,7 @@ model VerificationToken {
 }
 
 model parent {
-  parent_id                            Int                        @id
+  parent_id                            Int       @id
   title                                String?
   forename                             String?
   surname                              String?
@@ -68,9 +67,8 @@ model parent {
   email_address                        String?
   pupil_status                         String?
   password                             String?
-  created_at                           DateTime?                  @default(now()) @db.Timestamptz(6)
+  created_at                           DateTime? @default(now()) @db.Timestamptz(6)
   family                               family[]
-  
 }
 
 model family {
@@ -79,8 +77,8 @@ model family {
   parent_id            Int
   last_update_api_date String?
   created_at           DateTime? @default(now()) @db.Timestamptz(6)
-  student              student   @relation(fields: [student_id], references: [student_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_family_student")
   parent               parent    @relation(fields: [parent_id], references: [parent_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_family_parent")
+  student              student   @relation(fields: [student_id], references: [student_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_family_student")
 }
 
 model question {
@@ -92,9 +90,9 @@ model question {
   question_type_id        Int?
   created_at              DateTime?                 @default(now()) @db.Timestamptz(6)
   question_type           question_type?            @relation(fields: [question_type_id], references: [question_type_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_question_type")
+  survey_parent_question  survey_parent_question[]
   survey_question         survey_question[]
   survey_teacher_question survey_teacher_question[]
-  survey_parent_question  survey_parent_question[]
 }
 
 model question_type {
@@ -149,14 +147,14 @@ model student {
   enrolment_school_year          Int?
   password                       String?
   created_at                     DateTime?                        @default(now()) @db.Timestamptz(6)
+  family                         family[]
   set_list                       set_list[]
   student_by_year                student_by_year[]
-  student_has_survey_teacher     student_has_survey_teacher[]
-  survey_teacher_question_answer survey_teacher_question_answer[]
-  survey_parent_question_answer  survey_parent_question_answer[]
-  family                         family[]
   student_has_survey             student_has_survey[]
   student_has_survey_parent      student_has_survey_parent[]
+  student_has_survey_teacher     student_has_survey_teacher[]
+  survey_parent_question_answer  survey_parent_question_answer[]
+  survey_teacher_question_answer survey_teacher_question_answer[]
 }
 
 model student_by_year {
@@ -226,8 +224,8 @@ model year_group {
 model survey {
   survey_id          Int                  @id @default(autoincrement())
   created_at         DateTime?            @default(now()) @db.Timestamptz(6)
-  survey_question    survey_question[]
   student_has_survey student_has_survey[]
+  survey_question    survey_question[]
 }
 
 model survey_status {
@@ -300,10 +298,10 @@ model student_has_survey_teacher {
 }
 
 model survey_parent {
-  survey_parent_id         Int                        @id @default(autoincrement())
-  created_at               DateTime?                  @default(now()) @db.Timestamptz(6)
-  survey_parent_question   survey_parent_question[]
+  survey_parent_id          Int                         @id @default(autoincrement())
+  created_at                DateTime?                   @default(now()) @db.Timestamptz(6)
   student_has_survey_parent student_has_survey_parent[]
+  survey_parent_question    survey_parent_question[]
 }
 
 model survey_parent_question {
@@ -311,8 +309,8 @@ model survey_parent_question {
   survey_parent_id              Int
   question_id                   Int
   created_at                    DateTime?                       @default(now()) @db.Timestamptz(6)
-  survey_parent                 survey_parent                   @relation(fields: [survey_parent_id], references: [survey_parent_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_parent_question_survey_parent_fk")
   question                      question                        @relation(fields: [question_id], references: [question_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_parent_question_question_fk")
+  survey_parent                 survey_parent                   @relation(fields: [survey_parent_id], references: [survey_parent_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_parent_question_survey_parent_fk")
   survey_parent_question_answer survey_parent_question_answer[]
 }
 
@@ -322,8 +320,8 @@ model survey_parent_question_answer {
   student_id                Int
   answer                    String?
   created_at                DateTime?              @default(now()) @db.Timestamptz(6)
-  survey_parent_question    survey_parent_question @relation(fields: [survey_parent_question_id], references: [survey_parent_question_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_parent_question_answer_survey_parent_question_fk")
   student                   student                @relation(fields: [student_id], references: [student_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_parent_question_answer_student_fk")
+  survey_parent_question    survey_parent_question @relation(fields: [survey_parent_question_id], references: [survey_parent_question_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_parent_question_answer_survey_parent_question_fk")
 }
 
 model student_has_survey_parent {
