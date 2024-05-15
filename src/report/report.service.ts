@@ -335,6 +335,7 @@ export class ReportService {
     const subjectReportWithTeacherResponses = await this.getSubjectReportWithTeacher(id);
 
 
+
     const pdfBuffer: Buffer = await new Promise((resolve, reject) => {
       const doc = new PDFDocument(
         {
@@ -461,7 +462,6 @@ export class ReportService {
       doc.moveDown(1);
       //Tabla de whole college responses
 
-
       let rows = [];
       Object.entries(wholeCollegeResponses).forEach(([yearGroup, data]: [string, { studentSurveyed: number; questions: { agreePercentage: number; agreeAndNotSurePercentage: number; }[] }]) => {
         // Asumiendo que data.questions siempre tiene exactamente 5 preguntas, como en el ejemplo dado.
@@ -545,29 +545,31 @@ export class ReportService {
         const teacherName = teacherData.teacherName;  // Nombre completo del profesor
         let rows = [];
 
+        for (const yearName in teacherData.years) {
+          const setsInYear = teacherData.years[yearName]; // Asume que setsInYear es un array
 
-        teacherData.sets.forEach(set => {
-          const totalAgreeRow = [set.setCode, set.totalStudentSurveyed.toString(), 'Agree'];
-          const totalAgreeAndNotSureRow = ['', '', 'Agree And Not Sure'];
 
-          // Agregar resultados de cada pregunta a las filas
-          set.questionResults.forEach(question => {
-            totalAgreeRow.push(`${question.totalAgree}%`);
-            totalAgreeAndNotSureRow.push(`${question.totalAgreeAndNotSure}%`);
-          });
+          for (const set of setsInYear) {
+            const totalAgreeRow = [set.setCode, set.totalStudentSurveyed.toString(), 'Agree'];
+            const totalAgreeAndNotSureRow = ["", '', 'Agree And Not Sure'];
 
-          rows.push(totalAgreeRow);
-          rows.push(totalAgreeAndNotSureRow);
-        });
-        //agregar los datos de subjectReportResponses por grado
+            // Agregar resultados de cada pregunta a las filas
+            set.questionResults.forEach(question => {
+              totalAgreeRow.push(`${question.totalAgree}%`);
+              totalAgreeAndNotSureRow.push(`${question.totalAgreeAndNotSure}%`);
+            });
 
-        for (const yearGroup in subjectReportResponses) {
-          if (yearGroup !== 'subject' && yearGroup === teacherData.sets[0].yearName) {
-            const gradeData = subjectReportResponses[yearGroup];
+            rows.push(totalAgreeRow);
+            rows.push(totalAgreeAndNotSureRow);
+          }
+
+          // Suponiendo que subjectReportResponses es accesible y tiene la data correcta
+          if (subjectReportResponses[yearName]) {
+            const gradeData = subjectReportResponses[yearName];
             const totalSurveyed = gradeData.studentSurveyed
             const questionResults = gradeData.questions
 
-            const totalAgreeRowGrade = [yearGroup, totalSurveyed.toString(), 'Agree'];
+            const totalAgreeRowGrade = [yearName, totalSurveyed.toString(), 'Agree'];
             const totalAgreeAndNotSureRowGrade = ['', '', 'Agree And Not Sure'];
 
             questionResults.forEach(question => {
@@ -596,6 +598,7 @@ export class ReportService {
           columnsSize: [100, 60, 100, 50, 50, 50, 50, 50],
         });
 
+
         doc.moveDown(2)
         // hacer 2 tablas por hoja
 
@@ -608,6 +611,8 @@ export class ReportService {
           doc.moveDown();
         }
       }
+
+
 
 
 
@@ -888,6 +893,7 @@ export class ReportService {
         year_group: {
           select: {
             name: true,
+            year_id: true,
           },
         },
         teacher_by_set: {
@@ -901,11 +907,17 @@ export class ReportService {
             },
           },
         },
+      }, orderBy: {
+        year_group: {
+          year_id: "asc",
+        }
       }
     });
 
     const result = {};
+
     for (const set of sets) {
+
       const totalStudentSurveyed = await this.prisma.student_has_survey_teacher.aggregate({
         where: {
           survey_teacher: {
@@ -920,6 +932,26 @@ export class ReportService {
         },
         _count: true,
       });
+
+      const studentIds = await this.prisma.student_has_survey_teacher.findMany({
+        where: {
+          survey_teacher: {
+            created_at: {
+              lte: new Date('2024-03-05'),
+            },
+            set: {
+              set_code: set.set_code,
+            },
+          },
+          is_answered: true,
+        },
+        select: {
+          student_id: true
+        },
+        distinct: ['student_id']
+      });
+
+      const totalStudentSurveyedd = studentIds.length;
 
       const questionResults = [];
       for (let i = 1; i <= 5; i++) {
@@ -970,21 +1002,28 @@ export class ReportService {
         });
       }
 
-      const teacher = set.teacher_by_set[0].teacher;
-      const teacherKey = teacher.staff_id;  // Usar staff_id como clave
+      // Procesar cada profesor asociado a este set
+      set.teacher_by_set.forEach(teacherSet => {
+        const teacher = teacherSet.teacher;
+        const teacherKey = teacher.staff_id;
+        const yearName = set.year_group.name;
 
-      if (!result[teacherKey]) {
-        result[teacherKey] = {
-          teacherName: `${teacher.title}. ${teacher.surname}`,
-          sets: []
-        };
-      }
+        if (!result[teacherKey]) {
+          result[teacherKey] = {
+            teacherName: `${teacher.title}. ${teacher.surname}`,
+            years: {}
+          };
+        }
 
-      result[teacherKey].sets.push({
-        setCode: set.set_code,
-        yearName: set.year_group.name,
-        totalStudentSurveyed: totalStudentSurveyed._count,
-        questionResults,
+        if (!result[teacherKey].years[yearName]) {
+          result[teacherKey].years[yearName] = [];
+        }
+
+        result[teacherKey].years[yearName].push({
+          setCode: set.set_code,
+          totalStudentSurveyed: totalStudentSurveyedd,
+          questionResults,
+        });
       });
     }
 
@@ -1094,6 +1133,8 @@ export class ReportService {
     };
 
     for (const year of yearGroups) {
+      let studentSurveyCount = 0
+
       result[year.name] = {
         studentSurveyed: 0,
         questions: Array.from({ length: 5 }, (_, i) => {
@@ -1104,7 +1145,7 @@ export class ReportService {
           };
         })
       };
-
+      let studentSurveyedArray = []
       for (const set of year.set) {
 
         const totalStudentSurveyed = await this.prisma.student_has_survey_teacher.aggregate({
@@ -1123,7 +1164,27 @@ export class ReportService {
         });
 
         const studentCount = totalStudentSurveyed._count;
-        result[year.name].studentSurveyed += studentCount;
+        studentSurveyCount += studentCount;
+
+        const studentId = await this.prisma.student_has_survey_teacher.findMany({
+          where: {
+            survey_teacher: {
+              created_at: {
+                lte: new Date('2024-03-05'),
+              },
+              set: {
+                set_code: set.set_code,
+              },
+            },
+            is_answered: true,
+          },
+          select: {
+            student_id: true
+          },
+          distinct: ['student_id']
+        });
+
+        studentSurveyedArray.push(studentId)
 
         for (let questionId = 1; questionId <= 5; questionId++) {
           const totalAgree = await this.prisma.survey_teacher_question_answer.aggregate({
@@ -1172,12 +1233,20 @@ export class ReportService {
           result[year.name].questions[questionId - 1].agreeAndNotSurePercentage += agreeAndNotSurePercentage;
         }
       }
+      studentSurveyedArray = studentSurveyedArray.flat()
+
+      const uniqueStudentSurveyedArray = studentSurveyedArray.filter((item, index, array) => {
+        // Verificar si el índice actual es igual al índice de la primera ocurrencia del objeto en el array
+        return array.findIndex(obj => obj.student_id === item.student_id) === index;
+      });
+
+      result[year.name].studentSurveyed = uniqueStudentSurveyedArray.length;
 
 
       // Calcular los porcentajes promedio por pregunta
       result[year.name].questions.forEach(question => {
-        question.agreePercentage = Math.round((question.agreePercentage / result[year.name].studentSurveyed) * 100);
-        question.agreeAndNotSurePercentage = Math.round((question.agreeAndNotSurePercentage / result[year.name].studentSurveyed) * 100);
+        question.agreePercentage = Math.round((question.agreePercentage / studentSurveyCount) * 100);
+        question.agreeAndNotSurePercentage = Math.round((question.agreeAndNotSurePercentage / studentSurveyCount) * 100);
       });
     }
 
