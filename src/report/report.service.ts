@@ -455,8 +455,6 @@ export class ReportService {
       doc.text('', 50, 70);
       doc.moveDown();
 
-
-
       doc.font("Helvetica-Bold").fontSize(26);
       doc.text("Responses", { underline: true });
       doc.moveDown(1);
@@ -492,7 +490,10 @@ export class ReportService {
       });
 
       doc.moveDown(4);
-
+      doc.addPage();
+      doc.text('', 50, 70);
+      doc.moveDown();
+      
       // Tabla de teacher Report
       const subjectName = subjectReportResponses.subject
 
@@ -599,7 +600,7 @@ export class ReportService {
         });
 
 
-        doc.moveDown(2)
+        doc.moveDown(1)
         // hacer 2 tablas por hoja
 
         tableCount++;
@@ -611,10 +612,6 @@ export class ReportService {
           doc.moveDown();
         }
       }
-
-
-
-
 
 
       const buffer = []
@@ -1421,6 +1418,7 @@ export class ReportService {
       const result = {};
 
       for (const year of yearGroups) {
+        let studentSurveyCount = 0
         result[year.name] = {
           studentSurveyed: 0,
           questions: Array.from({ length: 5 }, (_, i) => {
@@ -1431,7 +1429,7 @@ export class ReportService {
             };
           })
         };
-
+        let studentSurveyedArray = []
         for (const set of year.set) {
           const totalStudentSurveyed = await this.prisma.student_has_survey_teacher.aggregate({
             where: {
@@ -1449,7 +1447,28 @@ export class ReportService {
           });
 
           const studentCount = totalStudentSurveyed._count;
-          result[year.name].studentSurveyed += studentCount;
+          studentSurveyCount += studentCount;
+  
+          const studentId = await this.prisma.student_has_survey_teacher.findMany({
+            where: {
+              survey_teacher: {
+                created_at: {
+                  lte: new Date('2024-03-05'),
+                },
+                set: {
+                  set_code: set.set_code,
+                },
+              },
+              is_answered: true,
+            },
+            select: {
+              student_id: true
+            },
+            distinct: ['student_id']
+          });
+  
+          studentSurveyedArray.push(studentId)
+          
 
           for (let questionId = 1; questionId <= 5; questionId++) {
             const totalAgree = await this.prisma.survey_teacher_question_answer.aggregate({
@@ -1498,11 +1517,19 @@ export class ReportService {
             result[year.name].questions[questionId - 1].agreeAndNotSurePercentage += agreeAndNotSurePercentage;
           }
         }
+        studentSurveyedArray = studentSurveyedArray.flat()
+
+        const uniqueStudentSurveyedArray = studentSurveyedArray.filter((item, index, array) => {
+          // Verificar si el índice actual es igual al índice de la primera ocurrencia del objeto en el array
+          return array.findIndex(obj => obj.student_id === item.student_id) === index;
+        });
+
+        result[year.name].studentSurveyed = uniqueStudentSurveyedArray.length;
 
         // Calcular los porcentajes promedio por pregunta
         result[year.name].questions.forEach(question => {
-          question.agreePercentage = Math.round((question.agreePercentage / result[year.name].studentSurveyed) * 100);
-          question.agreeAndNotSurePercentage = Math.round((question.agreeAndNotSurePercentage / result[year.name].studentSurveyed) * 100);
+          question.agreePercentage = Math.round((question.agreePercentage / studentSurveyCount) * 100);
+          question.agreeAndNotSurePercentage = Math.round((question.agreeAndNotSurePercentage / studentSurveyCount) * 100);
         });
       }
 
@@ -1608,6 +1635,26 @@ export class ReportService {
         _count: true,
       });
 
+      const studentIds = await this.prisma.student_has_survey_teacher.findMany({
+        where: {
+          survey_teacher: {
+            created_at: {
+              lte: new Date('2024-03-05'),
+            },
+            set: {
+              set_code: set.set_code,
+            },
+          },
+          is_answered: true,
+        },
+        select: {
+          student_id: true
+        },
+        distinct: ['student_id']
+      });
+
+      const totalStudentSurveyedd = studentIds.length;
+
       const questionResults = [];
 
       for (let i = 1; i <= 5; i++) {
@@ -1668,7 +1715,7 @@ export class ReportService {
         setCode: set.set_code,
         yearName: set.year_group.name,
         subject: set.subject.subject_name,
-        totalStudentSurveyed: totalStudentSurveyed._count,
+        totalStudentSurveyed: totalStudentSurveyedd,
         questionResults,
       });
     }
