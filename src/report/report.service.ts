@@ -241,27 +241,24 @@ export class ReportService {
 
 
 
-      // Tabla de teacher Report
       Object.entries(teacherReportResponses).forEach(([subject, yearGroups]) => {
-        // Crear una tabla para cada materia
         let rows = [];
         Object.entries(yearGroups).forEach(([yearGroup, data]) => {
           const totalAgreeRow = [yearGroup, data.studentSurveyed.toString(), 'Agree'];
           const totalAgreeAndNotSureRow = ['', '', 'Agree and Not sure'];
 
           data.questions.forEach(question => {
-            totalAgreeRow.push(`${question.agreePercentage}%`);
-            totalAgreeAndNotSureRow.push(`${question.agreeAndNotSurePercentage}%`);
-          });
+            const agreePercentage = question.agreePercentage;
+            const agreeAndNotSurePercentage = question.agreeAndNotSurePercentage;
 
-          // Agregar las filas al arreglo de filas
+            totalAgreeRow.push(`${agreePercentage}%`);
+            totalAgreeAndNotSureRow.push(`${agreeAndNotSurePercentage}%`);
+          });
 
           rows.push(totalAgreeRow);
           rows.push(totalAgreeAndNotSureRow);
-
         });
 
-        // Definir la tabla para cada materia
         const table = {
           title: `${subject} Responses`,
           subtitle: "A breakdown of student responses per year group",
@@ -269,98 +266,85 @@ export class ReportService {
           rows: rows
         };
 
-
-        // Agregar la tabla al documento
+        // Agregar la tabla al documento PDF
         doc.table(table, {
           columnsSize: [100, 60, 100, 50, 50, 50, 50, 50],
         });
 
-        // Agregar algo de espacio después de cada tabla antes de la siguiente
         doc.moveDown(2);
-        changePage++;
 
-
-        // Verificar si es necesario pasar a la siguiente página
         if (changePage % tablesPerPageSubject === 0) {
-          doc.addPage(); // Agregar una nueva página
+          doc.addPage();
           doc.text('', 50, 70);
           doc.moveDown();
         }
       });
 
-      // Agregar una nueva página para mostrar datos del teacher
-      doc.addPage();
-      doc.text('', 50, 70);
-      doc.moveDown();
-      changePage = 0;
-
 
 
 
       // Tablas de profesor con el nombre de profesor como titulo y el nombre de la materia como subtitulo
-      for (const grade in teacherReportResponses) {
-        let rows = [];
-        // nombre de materia, 1 tabla por materia
-        for (const yearGroup in teacherReportResponses[grade]) {
-          // yearGroup, va al final de los sets
-          Object.entries(teacherReportWithTeacherResponses).forEach(([teacherName, sets]) => {
+// Generación de las tablas de profesores
+for (const teacherName in teacherReportWithTeacherResponses) {
+  const teacherData = teacherReportWithTeacherResponses[teacherName];
 
+  for (const subject in teacherData.subjects) {
+    const rows = [];
 
-            (sets as any[]).forEach(set => {
-              if (set.subject === grade && set.yearName === yearGroup) {
-                const totalAgreeRow = [set.setCode, set.totalStudentSurveyed.toString(), 'Agree'];
-                const totalAgreeAndNotSureRow = ['', '', 'Agree And Not Sure'];
+    for (const yearName in teacherData.subjects[subject]) {
+      const setsInYear = teacherData.subjects[subject][yearName];
 
-                set.questionResults.forEach(question => {
-                  totalAgreeRow.push(`${question.totalAgree}%`);
-                  totalAgreeAndNotSureRow.push(`${question.totalAgreeAndNotSure}%`);
-                });
+      for (const set of setsInYear) {
+        const totalAgreeRow = [set.setCode, set.totalStudentSurveyed.toString(), 'Agree'];
+        const totalAgreeAndNotSureRow = ["", '', 'Agree And Not Sure'];
 
-
-                rows.push(totalAgreeRow);
-                rows.push(totalAgreeAndNotSureRow);
-              }
-            })
-          })
-
-
-          const gradeData = teacherReportResponses[grade][yearGroup];
-          const totalSurveyed = gradeData.studentSurveyed
-          const questionResults = gradeData.questions
-
-          const totalAgreeRowGrade = [yearGroup, totalSurveyed.toString(), 'Agree'];
-          const totalAgreeAndNotSureRowGrade = ['', '', 'Agree And NotSure'];
-
-          questionResults.forEach(question => {
-            totalAgreeRowGrade.push(`${question.agreePercentage}%`);
-            totalAgreeAndNotSureRowGrade.push(`${question.agreeAndNotSurePercentage}%`);
-          });
-
-          rows.push(totalAgreeRowGrade);
-          rows.push(totalAgreeAndNotSureRowGrade);
-        }
-
-
-        const table = {
-          title: `${teacherName.title}. ${teacherName.surname} - ${grade}`,
-          headers: ['Year Group', 'Student Surveyed', 'Answer', 'Question 1', 'Question 2', 'Question 3', 'Question 4', 'Question 5'],
-
-          rows: rows
-        };
-
-        doc.table(table, {
-          columnsSize: [100, 60, 100, 50, 50, 50, 50, 50],
+        set.questionResults.forEach(question => {
+          totalAgreeRow.push(`${question.totalAgree}%`);
+          totalAgreeAndNotSureRow.push(`${question.totalAgreeAndNotSure}%`);
         });
 
-        doc.moveDown(4);
-        if (changePage % tablesPerPageTeacher === 0) {
-          doc.addPage(); // Agregar una nueva página
-          doc.text('', 50, 70);
-          doc.moveDown();
-        }
-
-
+        rows.push(totalAgreeRow);
+        rows.push(totalAgreeAndNotSureRow);
       }
+
+      // Agregar los datos del grupo de año al final de los sets
+      if (teacherReportResponses[subject] && teacherReportResponses[subject][yearName]) {
+        const gradeData = teacherReportResponses[subject][yearName];
+        const totalSurveyed = gradeData.studentSurveyed;
+        const questionResults = gradeData.questions;
+
+        const totalAgreeRowGrade = [yearName, totalSurveyed.toString(), 'Agree'];
+        const totalAgreeAndNotSureRowGrade = ['', '', 'Agree And Not Sure'];
+
+        questionResults.forEach(question => {
+          totalAgreeRowGrade.push(`${question.agreePercentage}%`);
+          totalAgreeAndNotSureRowGrade.push(`${question.agreeAndNotSurePercentage}%`);
+        });
+
+        rows.push(totalAgreeRowGrade);
+        rows.push(totalAgreeAndNotSureRowGrade);
+      }
+    }
+
+    const table = {
+      title: `${teacherData.teacherName} - ${subject}`,
+      headers: ['Year Group', 'Student Surveyed', 'Answer', 'Question 1', 'Question 2', 'Question 3', 'Question 4', 'Question 5'],
+      rows: rows
+    };
+
+    doc.table(table, {
+      columnsSize: [100, 60, 100, 50, 50, 50, 50, 50],
+    });
+
+    doc.moveDown(4);
+    if (changePage % tablesPerPageTeacher === 0) {
+      doc.addPage();
+      doc.text('', 50, 70);
+      doc.moveDown();
+    }
+  }
+}
+
 
 
 
@@ -544,25 +528,25 @@ export class ReportService {
       // Tabla de teacher Report
       const subjectName = subjectReportResponses.subject;
 
-    let rowsSubject = [];
-    for (const yearGroup in subjectReportResponses) {
+      let rowsSubject = [];
+      for (const yearGroup in subjectReportResponses) {
         if (yearGroup !== 'subject') {
-            const gradeData = subjectReportResponses[yearGroup];
-            const totalSurveyed = gradeData.studentSurveyed;
-            const questionResults = gradeData.questions;
+          const gradeData = subjectReportResponses[yearGroup];
+          const totalSurveyed = gradeData.studentSurveyed;
+          const questionResults = gradeData.questions;
 
-            const totalAgreeRow = [yearGroup, totalSurveyed.toString(), 'Agree'];
-            const totalAgreeAndNotSureRow = ['', '', 'Agree And Not Sure'];
+          const totalAgreeRow = [yearGroup, totalSurveyed.toString(), 'Agree'];
+          const totalAgreeAndNotSureRow = ['', '', 'Agree And Not Sure'];
 
-            questionResults.forEach(question => {
-                totalAgreeRow.push(`${question.agreePercentage}%`);
-                totalAgreeAndNotSureRow.push(`${question.agreeAndNotSurePercentage}%`);
-            });
+          questionResults.forEach(question => {
+            totalAgreeRow.push(`${question.agreePercentage}%`);
+            totalAgreeAndNotSureRow.push(`${question.agreeAndNotSurePercentage}%`);
+          });
 
-            rowsSubject.push(totalAgreeRow);
-            rowsSubject.push(totalAgreeAndNotSureRow);
+          rowsSubject.push(totalAgreeRow);
+          rowsSubject.push(totalAgreeAndNotSureRow);
         }
-    }
+      }
       // Definir la tabla para cada materia
       const table = {
         title: `${subjectName} Responses`,
@@ -804,7 +788,7 @@ export class ReportService {
         totalAgreeAndNotSure: entry.porcentaje_respuestas_agree_not_sure,
       });
     });
-    
+
     return result;
   }
 
@@ -827,517 +811,183 @@ export class ReportService {
 
     // Procesar resultados para convertir BigInt a Number y estructurar los datos
     const processedResults = rawResults.map(entry => ({
-        ...entry,
-        cantidad_de_alumnos: Number(entry.cantidad_de_alumnos),
-        porcentaje_respuestas_agree: Number(entry.porcentaje_respuestas_agree),
-        porcentaje_respuestas_agree_not_sure: Number(entry.porcentaje_respuestas_agree_not_sure),
+      ...entry,
+      cantidad_de_alumnos: Number(entry.cantidad_de_alumnos),
+      porcentaje_respuestas_agree: Number(entry.porcentaje_respuestas_agree),
+      porcentaje_respuestas_agree_not_sure: Number(entry.porcentaje_respuestas_agree_not_sure),
     }));
 
     // Estructura de datos para los resultados finales
     const result: ProcessedResponse = {
-        subject: processedResults[0]?.subject_name || "",  // Asume que todos los registros tienen el mismo subject_name
+      subject: processedResults[0]?.subject_name || "",  // Asume que todos los registros tienen el mismo subject_name
     };
 
     processedResults.forEach(entry => {
-        const yearName = entry.name;
-        const questionId = entry.question_id;
+      const yearName = entry.name;
+      const questionId = entry.question_id;
 
-        if (!result[yearName]) {
-            result[yearName] = {
-                studentSurveyed: entry.cantidad_de_alumnos,
-                questions: Array.from({ length: 5 }, (_, i) => ({
-                    questionId: i + 1,
-                    agreePercentage: 0,
-                    agreeAndNotSurePercentage: 0,
-                }))
-            };
-        }
+      if (!result[yearName]) {
+        result[yearName] = {
+          studentSurveyed: entry.cantidad_de_alumnos,
+          questions: Array.from({ length: 5 }, (_, i) => ({
+            questionId: i + 1,
+            agreePercentage: 0,
+            agreeAndNotSurePercentage: 0,
+          }))
+        };
+      }
 
-        // Ajustar la cantidad de encuestados si es necesario
-        if (result[yearName].studentSurveyed < entry.cantidad_de_alumnos) {
-            result[yearName].studentSurveyed = entry.cantidad_de_alumnos;
-        }
+      // Ajustar la cantidad de encuestados si es necesario
+      if (result[yearName].studentSurveyed < entry.cantidad_de_alumnos) {
+        result[yearName].studentSurveyed = entry.cantidad_de_alumnos;
+      }
 
-        result[yearName].questions[questionId - 1].agreePercentage = entry.porcentaje_respuestas_agree;
-        result[yearName].questions[questionId - 1].agreeAndNotSurePercentage = entry.porcentaje_respuestas_agree_not_sure;
+      result[yearName].questions[questionId - 1].agreePercentage = entry.porcentaje_respuestas_agree;
+      result[yearName].questions[questionId - 1].agreeAndNotSurePercentage = entry.porcentaje_respuestas_agree_not_sure;
     });
 
 
 
     return result;
-}
+  }
 
 
 
   async getTeacherReport(id: number) {
-    const subjectsTeacher = await this.prisma.subject.findMany({
-      select: {
-        subject_name: true,
-      },
-      where: {
-        OR: [
-          {
-            set: {
-              some: {
-                year_id: {
-                  in: [7, 8, 9, 10, 11]
-                },
-                teacher_by_set: {
-                  some: {
-                    teacher_id: id,
-                    is_primary_teacher: true,
-                  },
-                },
-                survey_teacher: {
-                  some: {
-                    created_at: {
-                      gte: new Date('2024-03-05'),
-                    },
-                    student_has_survey_teacher: {
-                      some: {
-                        is_answered: true
-                      }
-                    },
-                  },
-                }
-              },
-            },
-          },
-          {
-            set: {
-              some: {
-                year_id: {
-                  in: [12, 13],
-                },
-                teacher_by_set: {
-                  some: {
-                    teacher_id: id,
-                  },
-                },
-                survey_teacher: {
-                  some: {
-                    created_at: {
-                      gte: new Date('2024-03-05'),
-                    },
-                    student_has_survey_teacher: {
-                      some: {
-                        is_answered: true
-                      }
-                    },
-                  },
-                }
-              },
-            },
-          }
-        ]
+    const rawResults: any[] = await this.prisma.$queryRaw`
+      select yg."name", s3.subject_name, stq.question_id,
+             count(distinct stqa.student_id) cantidad_de_alumnos,
+             round((sum(case when stqa.answer='Agree' then 1 else 0 end)::float / count(*)::float)*100) as porcentaje_respuestas_Agree,
+             round((sum(case when stqa.answer<>'Disagree' then 1 else 0 end)::float / count(*)::float)*100) as porcentaje_respuestas_Agree_Not_Sure
+      from survey_teacher_question stq
+      inner join survey_teacher st ON st.survey_teacher_id = stq.survey_teacher_id
+      inner join survey_teacher_question_answer stqa on stqa.survey_teacher_question_id = stq.survey_teacher_question_id
+      inner join "set" s on s.set_id = st.set_id
+      inner join student s2 on s2.student_id = stqa.student_id
+      inner join year_group yg on yg.year_id = s.year_id
+      inner join subject s3 on s3.subject_id = s.subject_id
+      inner join teacher t on t.staff_id = st.teacher_id
+      where st.created_at > '2024-03-17'
+        and t.staff_id = ${id}
+      group by yg."name", s3.subject_name, stq.question_id, yg.year_id
+      order by yg.year_id;
+    `;
+  
+    // Procesar resultados para convertir BigInt a Number y estructurar los datos
+    const processedResults = rawResults.map(entry => ({
+      ...entry,
+      cantidad_de_alumnos: Number(entry.cantidad_de_alumnos),
+      porcentaje_respuestas_Agree: Number(entry.porcentaje_respuestas_agree),
+      porcentaje_respuestas_Agree_Not_Sure: Number(entry.porcentaje_respuestas_agree_not_sure),
+
+      
+    }));
+  
+    // Estructura de datos para los resultados finales
+    const totalResults: { [subject: string]: ProcessedResponse } = {};
+  
+    processedResults.forEach(entry => {
+      const subjectName = entry.subject_name;
+      const yearName = entry.name;
+      const questionId = entry.question_id;
+  
+      if (!totalResults[subjectName]) {
+        totalResults[subjectName] = {};
       }
-    })
-
-    const totalResults = {};
-    for (const subject of subjectsTeacher) {
-
-      const yearGroups = await this.prisma.year_group.findMany({
-        select: {
-          name: true,
-          set: {
-            select: {
-              set_code: true
-            },
-            where: {
-              subject: {
-                subject_name: subject.subject_name,
-
-              },
-              survey_teacher: {
-                some: {
-                  created_at: {
-                    gte: new Date('2024-03-05'),
-                  },
-                  student_has_survey_teacher: {
-                    some: {
-                      is_answered: true,
-                    }
-                  }
-                }
-              },
-            }
-          }
-        },
-        where: {
-          OR: [
-            {
-              set: {
-                some: {
-                  year_id: {
-                    in: [7, 8, 9, 10, 11]
-                  },
-                  subject: {
-                    subject_name: subject.subject_name,
-                  },
-                  survey_teacher: {
-                    some: {
-                      created_at: {
-                        gte: new Date('2024-03-05'),
-                      },
-                      student_has_survey_teacher: {
-                        some: {
-                          is_answered: true,
-                        }
-                      }
-                    }
-                  },
-                  teacher_by_set: {
-                    some: {
-                      teacher_id: id,
-                      is_primary_teacher: true,
-                    }
-                  },
-                },
-              },
-            },
-            {
-              set: {
-                some: {
-                  year_id: {
-                    in: [12, 13],
-                  },
-                  subject: {
-                    subject_name: subject.subject_name,
-                  },
-                  survey_teacher: {
-                    some: {
-                      created_at: {
-                        gte: new Date('2024-03-05'),
-                      },
-                      student_has_survey_teacher: {
-                        some: {
-                          is_answered: true,
-                        }
-                      }
-                    }
-                  },
-                  teacher_by_set: {
-                    some: {
-                      teacher_id: id,
-                    }
-                  }
-                },
-              }
-            }
-          ]
-        },
-        orderBy: {
-          year_id: "asc"
-        }
-
-      });
-
-      const result = {};
-
-      for (const year of yearGroups) {
-        let studentSurveyCount = 0
-        result[year.name] = {
-          studentSurveyed: 0,
-          questions: Array.from({ length: 5 }, (_, i) => {
-            return {
-              questionId: i + 1,
-              agreePercentage: 0,
-              agreeAndNotSurePercentage: 0
-            };
-          })
+  
+      if (!totalResults[subjectName][yearName]) {
+        totalResults[subjectName][yearName] = {
+          studentSurveyed: entry.cantidad_de_alumnos,
+          questions: Array.from({ length: 5 }, (_, i) => ({
+            questionId: i + 1,
+            agreePercentage: 0,
+            agreeAndNotSurePercentage: 0,
+          })),
         };
-        let studentSurveyedArray = []
-        for (const set of year.set) {
-          const totalStudentSurveyed = await this.prisma.student_has_survey_teacher.aggregate({
-            where: {
-              survey_teacher: {
-                created_at: {
-                  gte: new Date('2024-03-05'),
-                },
-                set: {
-                  set_code: set.set_code,
-                },
-              },
-              is_answered: true,
-            },
-            _count: true,
-          });
-
-          const studentCount = totalStudentSurveyed._count;
-          studentSurveyCount += studentCount;
-
-          const studentId = await this.prisma.student_has_survey_teacher.findMany({
-            where: {
-              survey_teacher: {
-                created_at: {
-                  gte: new Date('2024-03-05'),
-                },
-                set: {
-                  set_code: set.set_code,
-                },
-              },
-              is_answered: true,
-            },
-            select: {
-              student_id: true
-            },
-            distinct: ['student_id']
-          });
-
-          studentSurveyedArray.push(studentId)
-
-
-          for (let questionId = 1; questionId <= 5; questionId++) {
-            const totalAgree = await this.prisma.survey_teacher_question_answer.aggregate({
-              where: {
-                survey_teacher_question: {
-                  survey_teacher: {
-                    created_at: {
-                      gte: new Date('2024-03-05'),
-                    },
-                    set: {
-                      set_code: set.set_code,
-                    },
-                  },
-                  question_id: questionId,
-                },
-                answer: {
-                  equals: "Agree",
-                },
-              },
-              _count: true,
-            });
-
-            const totalAgreeAndNotSure = await this.prisma.survey_teacher_question_answer.aggregate({
-              where: {
-                survey_teacher_question: {
-                  survey_teacher: {
-                    created_at: {
-                      gte: new Date('2024-03-05'),
-                    },
-                    set: {
-                      set_code: set.set_code,
-                    },
-                  },
-                  question_id: questionId,
-                },
-                answer: {
-                  in: ["Agree", "Not sure"],
-                },
-              },
-              _count: true,
-            });
-            const agreePercentage = totalAgree._count
-            const agreeAndNotSurePercentage = totalAgreeAndNotSure._count
-
-            result[year.name].questions[questionId - 1].agreePercentage += agreePercentage;
-            result[year.name].questions[questionId - 1].agreeAndNotSurePercentage += agreeAndNotSurePercentage;
-          }
-        }
-        studentSurveyedArray = studentSurveyedArray.flat()
-
-        const uniqueStudentSurveyedArray = studentSurveyedArray.filter((item, index, array) => {
-          // Verificar si el índice actual es igual al índice de la primera ocurrencia del objeto en el array
-          return array.findIndex(obj => obj.student_id === item.student_id) === index;
-        });
-
-        result[year.name].studentSurveyed = uniqueStudentSurveyedArray.length;
-
-        // Calcular los porcentajes promedio por pregunta
-        result[year.name].questions.forEach(question => {
-          question.agreePercentage = Math.round((question.agreePercentage / studentSurveyCount) * 100);
-          question.agreeAndNotSurePercentage = Math.round((question.agreeAndNotSurePercentage / studentSurveyCount) * 100);
-        });
       }
-
-      totalResults[subject.subject_name] = result;
-    }
+  
+      // Ajustar la cantidad de encuestados si es necesario
+      if (totalResults[subjectName][yearName].studentSurveyed < entry.cantidad_de_alumnos) {
+        totalResults[subjectName][yearName].studentSurveyed = entry.cantidad_de_alumnos;
+      }
+  
+      totalResults[subjectName][yearName].questions[questionId - 1].agreePercentage = entry.porcentaje_respuestas_Agree;
+      totalResults[subjectName][yearName].questions[questionId - 1].agreeAndNotSurePercentage = entry.porcentaje_respuestas_Agree_Not_Sure;
+    });
+  
     return totalResults;
   }
 
   async getTeacherReportWithSubject(id: number) {
-    const sets = await this.prisma.set.findMany({
-      where: {
-        OR: [{
-          teacher_by_set: {
-            some: {
-              teacher_id: id,
-              is_primary_teacher: true,
-            },
-          },
-          survey_teacher: {
-            some: {
-              created_at: {
-                gte: new Date('2024-03-05'),
-              },
-              teacher_id: id,
-              student_has_survey_teacher: {
-                some: {
-                  is_answered: true
-                }
-              }
-            }
-          },
-          year_id: {
-            in: [7, 8, 9, 10, 11],
-          },
-        },
-        {
-          teacher_by_set: {
-            some: {
-              teacher_id: id,
-            },
-          },
-          survey_teacher: {
-            some: {
-              created_at: {
-                gte: new Date('2024-03-05'),
-              },
-              teacher_id: id,
-              student_has_survey_teacher: {
-                some: {
-                  is_answered: true
-                }
-              }
-            }
-          },
-          year_id: {
-            in: [12, 13],
-          },
-        },
-        ]
-      },
-      select: {
-        set_code: true,
-        year_group: {
-          select: {
-            name: true
-          },
-        },
-        subject: {
-          select: {
-            subject_name: true,
-          },
-        },
-      },
-      // distinct: ['set_code'],
-      orderBy: { subject_id: 'desc' }
-    });
-
-    const result = {};
-
-    const teacherName = await this.prisma.teacher.findFirst({
-      select: {
-        title: true,
-        surname: true,
-      },
-      where: {
-        staff_id: id
-      }
-    })
-    // Crear un objeto para almacenar el resultado final, donde cada clave es el nombre de la materia
-    for (const set of sets) {
-      const totalStudentSurveyed = await this.prisma.student_has_survey_teacher.aggregate({
-        where: {
-          survey_teacher: {
-            created_at: {
-              gte: new Date('2024-03-05'),
-            },
-            set: {
-              set_code: set.set_code,
-            },
-          },
-          is_answered: true,
-        },
-        _count: true,
-      });
-
-      const studentIds = await this.prisma.student_has_survey_teacher.findMany({
-        where: {
-          survey_teacher: {
-            created_at: {
-              gte: new Date('2024-03-05'),
-            },
-            set: {
-              set_code: set.set_code,
-            },
-          },
-          is_answered: true,
-        },
-        select: {
-          student_id: true
-        },
-        distinct: ['student_id']
-      });
-
-      const totalStudentSurveyedd = studentIds.length;
-
-      const questionResults = [];
-
-      for (let i = 1; i <= 5; i++) {
-        const totalAgree = await this.prisma.survey_teacher_question_answer.aggregate({
-          where: {
-            survey_teacher_question: {
-              survey_teacher: {
-                created_at: {
-                  gte: new Date('2024-03-05'),
-                },
-                set: {
-                  set_code: set.set_code,
-                },
-              },
-              question_id: i,
-            },
-            answer: {
-              equals: "Agree",
-            },
-          },
-          _count: true,
-        });
-
-        const totalAgreeAndNotSure = await this.prisma.survey_teacher_question_answer.aggregate({
-          where: {
-            survey_teacher_question: {
-              survey_teacher: {
-                created_at: {
-                  gte: new Date('2024-03-05'),
-                },
-                set: {
-                  set_code: set.set_code,
-                },
-              },
-              question_id: i,
-            },
-            answer: {
-              in: ["Agree", "Not sure"],
-            },
-          },
-          _count: true,
-        });
-
-        questionResults.push({
-          questionId: i,
-          totalAgree: Math.round((totalAgree._count / totalStudentSurveyed._count) * 100),
-          totalAgreeAndNotSure: Math.round((totalAgreeAndNotSure._count / totalStudentSurveyed._count) * 100)
-        });
-      }
-
-      const teacherKey = teacherName.title + "." + ' ' + teacherName.surname;
-
+    const rawResults: any[] = await this.prisma.$queryRaw`
+      select yg."name" , s.set_code , t.surname, t.title , s3.subject_name , stq.question_id,
+             count(distinct stqa.student_id) cantidad_de_alumnos,
+             round((sum(case when stqa.answer='Agree' then 1 else 0 end)::float / count(*)::float)*100) as porcentaje_respuestas_Agree,
+             round((sum(case when stqa.answer<>'Disagree' then 1 else 0 end)::float / count(*)::float)*100) as porcentaje_respuestas_Agree_Not_Sure
+      from survey_teacher_question stq
+      inner join survey_teacher st ON st.survey_teacher_id = stq.survey_teacher_id
+      inner join survey_teacher_question_answer stqa on stqa.survey_teacher_question_id = stq.survey_teacher_question_id
+      inner join "set" s on s.set_id = st.set_id
+      inner join student s2 on s2.student_id = stqa.student_id
+      inner join year_group yg on yg.year_id = s.year_id
+      inner join subject s3 on s3.subject_id = s.subject_id
+      inner join teacher t on t.staff_id = st.teacher_id
+      where st.created_at > '2024-03-17' and t.staff_id = ${id}
+      group by yg."name", s.set_code, t.surname, t.title, s3.subject_name, stq.question_id, yg.year_id
+      order by yg.year_id
+    `;
+  
+    const processedResults = rawResults.map(entry => ({
+      ...entry,
+      cantidad_de_alumnos: Number(entry.cantidad_de_alumnos),
+      porcentaje_respuestas_Agree: Number(entry.porcentaje_respuestas_agree),
+      porcentaje_respuestas_Agree_Not_Sure: Number(entry.porcentaje_respuestas_agree_not_sure),
+    }));
+  
+    const result: { [teacherKey: string]: { teacherName: string, subjects: { [subjectName: string]: { [yearName: string]: any[] } } } } = {};
+  
+    processedResults.forEach(entry => {
+      const teacherKey = `${entry.title} ${entry.surname}`;
+      const yearName = entry.name;
+      const subjectName = entry.subject_name;
+      
       if (!result[teacherKey]) {
-        result[teacherKey] = [];
+        result[teacherKey] = {
+          teacherName: `${entry.title} ${entry.surname}`,
+          subjects: {}
+        };
       }
-
-      result[teacherKey].push({
-        setCode: set.set_code,
-        yearName: set.year_group.name,
-        subject: set.subject.subject_name,
-        totalStudentSurveyed: totalStudentSurveyedd,
-        questionResults,
-      });
-    }
-
+  
+      if (!result[teacherKey].subjects[subjectName]) {
+        result[teacherKey].subjects[subjectName] = {};
+      }
+      
+      if (!result[teacherKey].subjects[subjectName][yearName]) {
+        result[teacherKey].subjects[subjectName][yearName] = [];
+      }
+  
+      const existingSet = result[teacherKey].subjects[subjectName][yearName].find(set => set.setCode === entry.set_code);
+      
+      if (!existingSet) {
+        result[teacherKey].subjects[subjectName][yearName].push({
+          setCode: entry.set_code,
+          totalStudentSurveyed: entry.cantidad_de_alumnos,
+          questionResults: Array.from({ length: 5 }, (_, i) => ({
+            questionId: i + 1,
+            totalAgree: 0,
+            totalAgreeAndNotSure: 0,
+          })),
+        });
+      }
+  
+      const currentSet = result[teacherKey].subjects[subjectName][yearName].find(set => set.setCode === entry.set_code);
+      currentSet.questionResults[entry.question_id - 1] = {
+        questionId: entry.question_id,
+        totalAgree: entry.porcentaje_respuestas_Agree,
+        totalAgreeAndNotSure: entry.porcentaje_respuestas_Agree_Not_Sure,
+      };
+    });
+  
     return result;
   }
-
 }
