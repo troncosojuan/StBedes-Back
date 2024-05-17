@@ -700,8 +700,6 @@ export class ReportService {
       order by yg.year_id
     `;
 
-    // Verificar los datos obtenidos de la consulta
-    console.log("Datos obtenidos de la consulta SQL:", yearGroupsQuery);
 
     // Procesar resultados para convertir BigInt a Number
     const processedResults = yearGroupsQuery.map(entry => ({
@@ -710,9 +708,6 @@ export class ReportService {
       porcentaje_respuestas_agree: Number(entry.porcentaje_respuestas_agree),
       porcentaje_respuestas_agree_not_sure: Number(entry.porcentaje_respuestas_agree_not_sure),
     }));
-
-    // Verificar los resultados procesados
-    console.log("Resultados procesados:", processedResults);
 
     // Estructura de datos para los resultados finales
     const result: ProcessedResponse = {};
@@ -740,9 +735,6 @@ export class ReportService {
       result[yearName].questions[questionId - 1].agreePercentage = entry.porcentaje_respuestas_agree;
       result[yearName].questions[questionId - 1].agreeAndNotSurePercentage = entry.porcentaje_respuestas_agree_not_sure;
     });
-
-    // Verificar la estructura final
-    console.log("Estructura final:", result);
 
     return result;
   }
@@ -812,9 +804,7 @@ export class ReportService {
         totalAgreeAndNotSure: entry.porcentaje_respuestas_agree_not_sure,
       });
     });
-
-    console.log("Estructura final:", result);
-
+    
     return result;
   }
 
@@ -872,8 +862,7 @@ export class ReportService {
         result[yearName].questions[questionId - 1].agreeAndNotSurePercentage = entry.porcentaje_respuestas_agree_not_sure;
     });
 
-    // Verificar la estructura final
-    console.log("Estructura final:", result);
+
 
     return result;
 }
