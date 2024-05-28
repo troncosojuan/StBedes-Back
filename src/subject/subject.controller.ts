@@ -24,6 +24,6 @@ export class SubjectController {
     @Get('all/status')
     @ApiResponse({ status: 201, description: "Subjects retrieved successfully" })
     async getAllSubjectsStatus() {
-        await this.subjectService.getAllSubjectsStatus();
+        return await this.subjectService.getAllSubjectsStatus();
     }
 }
