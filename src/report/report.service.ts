@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 const PDFDocument = require('pdfkit-table');
 import { PrismaService } from 'src/prisma/prisma.service';
+import axios, { AxiosInstance } from 'axios';
 
 import { join, resolve } from 'path';
 import { groupBy } from 'rxjs';
@@ -56,19 +57,123 @@ interface ProcessedSubjectResponse {
 export class ReportService {
 
   constructor(private readonly prisma: PrismaService) { }
+  private axiosInstance: AxiosInstance = axios.create({
+    baseURL: 'https://script.google.com/macros/s/AKfycbyaUrWQn9lsUIx4-MpohAScBDZpbz9PR4OSnGSkgIGXGCaJ6d_MuW4WlzPbhBL7aiIu0A/exec',
+    // other settings
+  }); 
+  reportExist(array, targetId) {
+    for(let i = 0; i < array.length; i++){
+      if(array[i].subject_id == targetId){
+        return true;
+      }
+      if(array[i].teacher_id == targetId){
+        return true;
+      }
+    }
+    return false;
+  }
+
+  async generateRemainingReports() {
+    const surveyGroups = await this.prisma.survey_group.findMany({
+      include: {
+        subject_reports: true,
+        teacher_reports: true,
+      }
+    })
+    const subjects = await this.prisma.subject.findMany({
+      where: {
+        is_included: true,
+      }
+    })
+    for(let s = 0; s < subjects.length; s++){
+      for(let sg = 0; sg < surveyGroups.length; sg++){
+        if(surveyGroups[sg].subject_reports.length == 0){
+          await this.generateAndUploadSubjectReport(subjects[s].subject_id, subjects[s].subject_name, surveyGroups[sg].id, surveyGroups[sg].name, surveyGroups[sg].subject_folder_id)
+        }else if(this.reportExist(surveyGroups[sg].subject_reports, subjects[s].subject_id)){
+          //console.log("exist")
+        }else{
+          //console.log("not exist")
+          await this.generateAndUploadSubjectReport(subjects[s].subject_id, subjects[s].subject_name, surveyGroups[sg].id, surveyGroups[sg].name, surveyGroups[sg].subject_folder_id)
+        }
+      }
+      
+    }
+    const teachers = await this.prisma.teacher.findMany({})
+    for(let t = 0; t < teachers.length; t++){
+      for(let sg = 0; sg < surveyGroups.length; sg++){
+        if(surveyGroups[sg].subject_reports.length == 0){
+          await this.generateAndUploadTeacherReport(teachers[t].staff_id, teachers[t].full_name, surveyGroups[sg].id, surveyGroups[sg].name, surveyGroups[sg].teacher_folder_id)
+        }else if(this.reportExist(surveyGroups[sg].subject_reports, teachers[t].staff_id)){
+          //console.log("exist")
+        }else{
+          //console.log("not exist")
+          await this.generateAndUploadTeacherReport(teachers[t].staff_id, teachers[t].full_name, surveyGroups[sg].id, surveyGroups[sg].name, surveyGroups[sg].teacher_folder_id)
+        }
+      }
+      
+    }
+
+    return 'ok'
+  }
 
 
+  async generateAndUploadSubjectReport(subjectId, subjectName, surveyGroupId, identifier, folderId){
+    const report = await this.getSubjectReportPDF(subjectId, identifier);
+    const base64String = report.buffer.toString('base64');
+    
+    this.axiosInstance.post('', {
+      "parts": [
+        {
+          "partName": subjectName + ", " + identifier,
+          "folder_id": folderId,
+          "pdf": base64String
+        }
+      ]
+    }
+    )
 
-  async getTeacherReportPDF(id: number): Promise<{ buffer: Buffer; fileName: string }> {
+    await this.prisma.report_subject_emited.create({
+      data: {
+        subject_id: subjectId,
+        survey_group_id: surveyGroupId,
+      }
+    })
+  }
+
+  async generateAndUploadTeacherReport(teacherId, teacherName, surveyGroupId, identifier, folderId){
+    const report = await this.getTeacherReportPDF(teacherId, identifier);
+    const base64String = report.buffer.toString('base64');
+    
+    this.axiosInstance.post('', {
+      "parts": [
+        {
+          "partName": teacherName + ", " + identifier,
+          "folder_id": folderId,
+          "pdf": base64String
+        }
+      ]
+    }
+    )
+
+    await this.prisma.report_teacher_emited.create({
+      data: {
+        teacher_id: teacherId,
+        survey_group_id: surveyGroupId,
+      }
+    })
+  }
+
+
+  async getTeacherReportPDF(id: number, identifier = 'Feb 24'): Promise<{ buffer: Buffer; fileName: string }> {
 
     //Setup para cargar dos tablas por hoja
     let changePage = 0;
     const tablesPerPageSubject = 3
     const tablesPerPageTeacher = 2
 
-    const wholeCollegeResponses = await this.getWholeCollegeResponses();
-    const teacherReportResponses = await this.getTeacherReport(id)
-    const teacherReportWithTeacherResponses = await this.getTeacherReportWithSubject(id)
+    const wholeCollegeResponses = await this.getWholeCollegeResponses(identifier);
+    const teacherReportResponses = await this.getTeacherReport(id, identifier)
+    const teacherReportWithTeacherResponses = await this.getTeacherReportWithSubject(id, identifier)
 
 
     const teacherName = await this.prisma.teacher.findFirst({
@@ -362,10 +467,10 @@ for (const teacherName in teacherReportWithTeacherResponses) {
   }
 
 
-  async getSubjectReportPDF(id: number): Promise<{ buffer: Buffer; fileName: string }> {
-    const wholeCollegeResponses = await this.getWholeCollegeResponses();
-    const subjectReportResponses = await this.getSubjectReport(id);
-    const subjectReportWithTeacherResponses = await this.getSubjectReportWithTeacher(id);
+  async getSubjectReportPDF(id: number, identifier = 'Feb 24'): Promise<{ buffer: Buffer; fileName: string }> {
+    const wholeCollegeResponses = await this.getWholeCollegeResponses(identifier);
+    const subjectReportResponses = await this.getSubjectReport(id, identifier);
+    const subjectReportWithTeacherResponses = await this.getSubjectReportWithTeacher(id, identifier);
 
 
 
@@ -667,7 +772,7 @@ for (const teacherName in teacherReportWithTeacherResponses) {
   }
 
 
-  async getWholeCollegeResponses(): Promise<ProcessedResponse> {
+  async getWholeCollegeResponses(identifier = 'Feb 24'): Promise<ProcessedResponse> {
     const yearGroupsQuery: YearGroupResponse[] = await this.prisma.$queryRaw`
       select yg."name", yg.year_id, stq.question_id,
         count(distinct stqa.student_id) cantidad_de_alumnos,
@@ -679,7 +784,7 @@ for (const teacherName in teacherReportWithTeacherResponses) {
       inner join "set" s on s.set_id = st.set_id
       INNER JOIN student s2 on s2.student_id = stqa.student_id
       inner join year_group yg on yg.year_id = s.year_id
-      where st.created_at > '2024-03-17'
+      where st.identifier = ${identifier}
       group by 1, 2, 3
       order by yg.year_id
     `;
@@ -725,7 +830,7 @@ for (const teacherName in teacherReportWithTeacherResponses) {
 
 
 
-  async getSubjectReportWithTeacher(id: number): Promise<ProcessedSubjectResponse> {
+  async getSubjectReportWithTeacher(id: number, identifier = 'Feb 24'): Promise<ProcessedSubjectResponse> {
     const subjectTeacherQuery: SubjectTeacherResponse[] = await this.prisma.$queryRaw`
       select yg."name", s.set_code, t.surname, t.title, stq.question_id,
         count(distinct stqa.student_id) as cantidad_de_alumnos,
@@ -739,7 +844,7 @@ for (const teacherName in teacherReportWithTeacherResponses) {
       inner join year_group yg on yg.year_id = s.year_id
       inner join subject sub on sub.subject_id = s.subject_id
       inner join teacher t on t.staff_id = st.teacher_id
-      where st.created_at > '2024-03-17'
+      where st.identifier = ${identifier}
         and sub.subject_id = ${id}
       group by yg."name", s.set_code, t.surname, t.title, stq.question_id, yg.year_id
       order by yg.year_id;
@@ -792,7 +897,7 @@ for (const teacherName in teacherReportWithTeacherResponses) {
     return result;
   }
 
-  async getSubjectReport(id: number) {
+  async getSubjectReport(id: number, identifier = 'Feb 24') {
     const rawResults: any[] = await this.prisma.$queryRaw`
         select yg."name", stq.question_id, sub.subject_name,
             count(distinct stqa.student_id) as cantidad_de_alumnos,
@@ -804,7 +909,7 @@ for (const teacherName in teacherReportWithTeacherResponses) {
         inner join "set" s on s.set_id = st.set_id
         inner join year_group yg on yg.year_id = s.year_id
         inner join subject sub on sub.subject_id = s.subject_id
-        where st.created_at > '2024-03-17' and sub.subject_id = ${id}
+        where st.identifier = ${identifier} and sub.subject_id = ${id}
         group by yg."name", stq.question_id, yg.year_id, sub.subject_name
         order by yg.year_id;
     `;
@@ -853,7 +958,7 @@ for (const teacherName in teacherReportWithTeacherResponses) {
 
 
 
-  async getTeacherReport(id: number) {
+  async getTeacherReport(id: number, identifier = 'Feb 24') {
     const rawResults: any[] = await this.prisma.$queryRaw`
       select yg."name", s3.subject_name, stq.question_id,
              count(distinct stqa.student_id) cantidad_de_alumnos,
@@ -867,7 +972,7 @@ for (const teacherName in teacherReportWithTeacherResponses) {
       inner join year_group yg on yg.year_id = s.year_id
       inner join subject s3 on s3.subject_id = s.subject_id
       inner join teacher t on t.staff_id = st.teacher_id
-      where st.created_at > '2024-03-17'
+      where st.identifier = ${identifier}
         and t.staff_id = ${id}
       group by yg."name", s3.subject_name, stq.question_id, yg.year_id
       order by yg.year_id;
@@ -918,7 +1023,7 @@ for (const teacherName in teacherReportWithTeacherResponses) {
     return totalResults;
   }
 
-  async getTeacherReportWithSubject(id: number) {
+  async getTeacherReportWithSubject(id: number, identifier = 'Feb 24') {
     const rawResults: any[] = await this.prisma.$queryRaw`
       select yg."name" , s.set_code , t.surname, t.title , s3.subject_name , stq.question_id,
              count(distinct stqa.student_id) cantidad_de_alumnos,
@@ -932,7 +1037,7 @@ for (const teacherName in teacherReportWithTeacherResponses) {
       inner join year_group yg on yg.year_id = s.year_id
       inner join subject s3 on s3.subject_id = s.subject_id
       inner join teacher t on t.staff_id = st.teacher_id
-      where st.created_at > '2024-03-17' and t.staff_id = ${id}
+      where st.identifier = ${identifier} and t.staff_id = ${id}
       group by yg."name", s.set_code, t.surname, t.title, s3.subject_name, stq.question_id, yg.year_id
       order by yg.year_id
     `;

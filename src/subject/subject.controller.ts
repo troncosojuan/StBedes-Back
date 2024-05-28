@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { SubjectService } from './subject.service';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateSubjectDto } from './dto/createSubject';
@@ -19,5 +19,11 @@ export class SubjectController {
     @ApiResponse({ status: 201, description: "Subject created successfully" })
     async create(@Body() createSubjectDto: CreateSubjectDto) {
         await this.subjectService.create(createSubjectDto);
+    }
+
+    @Get('all/status')
+    @ApiResponse({ status: 201, description: "Subjects retrieved successfully" })
+    async getAllSubjectsStatus() {
+        await this.subjectService.getAllSubjectsStatus();
     }
 }

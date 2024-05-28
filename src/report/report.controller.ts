@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Res } from '@nestjs/common';
+import { Body, Controller, Get, Param, Res } from '@nestjs/common';
 import { ReportService } from './report.service';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 
@@ -6,6 +6,14 @@ import { ApiResponse, ApiTags } from '@nestjs/swagger';
 @Controller('report')
 export class ReportController {
   constructor(private readonly reportService: ReportService) { }
+
+  
+  @Get("upload-remaining")
+  @ApiResponse({ status: 200, description: "Report generated successfully" })
+  async generateRemainingReports(@Res() res: any) {
+    const res2 = await this.reportService.generateRemainingReports();
+    res.send(res2);
+  }
 
 
   @Get("get-teacher-report-pdf/:id")

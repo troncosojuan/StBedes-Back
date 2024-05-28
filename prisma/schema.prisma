@@ -174,6 +174,7 @@ model subject {
   last_update_api_date String?
   created_at           DateTime?  @default(now()) @db.Timestamptz(6)
   set                  set[]
+  reports              report_subject_emited[]
   department           department @relation(fields: [department_id], references: [department_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_subject_department")
 }
 
@@ -200,6 +201,8 @@ model teacher {
   created_at           DateTime?        @default(now()) @db.Timestamptz(6)
   survey_teacher       survey_teacher[]
   teacher_by_set       teacher_by_set[]
+  reports              report_teacher_emited[]
+
 }
 
 model teacher_by_set {
@@ -224,6 +227,7 @@ model year_group {
 model survey {
   survey_id          Int                  @id @default(autoincrement())
   created_at         DateTime?            @default(now()) @db.Timestamptz(6)
+  identifier         String?
   student_has_survey student_has_survey[]
   survey_question    survey_question[]
 }
@@ -260,6 +264,7 @@ model survey_teacher {
   teacher_id                 Int
   set_id                     Int
   created_at                 DateTime?                    @default(now()) @db.Timestamptz(6)
+  identifier                 String?
   student_has_survey_teacher student_has_survey_teacher[]
   set                        set                          @relation(fields: [set_id], references: [set_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_teacher_set_fk")
   teacher                    teacher                      @relation(fields: [teacher_id], references: [staff_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_teacher_teacher_fk")
@@ -342,4 +347,30 @@ model student_has_survey {
   created_at  DateTime? @default(now()) @db.Timestamptz(6)
   student     student   @relation(fields: [student_id], references: [student_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_by_student_student_fk")
   survey      survey    @relation(fields: [survey_id], references: [survey_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_by_student_survey_fk")
+}
+
+
+model survey_group {
+  id          Int        @id @default(autoincrement())
+  name        String
+  subject_folder_id String?
+  teacher_folder_id String?
+  subject_reports     report_subject_emited[]
+  teacher_reports     report_teacher_emited[]
+}
+
+model report_subject_emited {
+  id              Int           @id @default(autoincrement())
+  survey_group_id Int
+  survey_group    survey_group  @relation(fields: [survey_group_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "survey_group_report_fk")
+  subject_id      Int
+  subject         subject       @relation(fields: [subject_id], references: [subject_id], onDelete: NoAction, onUpdate: NoAction, map: "subject_report_fk")
+}
+
+model report_teacher_emited {
+  id              Int           @id @default(autoincrement())
+  survey_group_id Int
+  survey_group    survey_group  @relation(fields: [survey_group_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "survey_teacher_group_report_fk")
+  teacher_id      Int
+  teacher         teacher       @relation(fields: [teacher_id], references: [staff_id], onDelete: NoAction, onUpdate: NoAction, map: "teacher_report_fk")
 }

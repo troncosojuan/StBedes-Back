@@ -1,21 +1,43 @@
-const { Fernet } = require('fernet-nodejs');
-const OAuthClient = require('intuit-oauth')
+const prismac = require('@prisma/client')
 
-const oauthClient = new OAuthClient({
-  clientId: "ABYs9K7nNAyIydfyQqccsA0bh0zuygGDh87S8E3BBmHiyo5bSX",
-  clientSecret: "GI6NVRaFZQJ2mWwWDVwdS95xtfhHDfoEoe96LoCt",
-  environment: "sandbox",
-  redirectUri: "http://localhost:3001/v2/quickbooks/permissions/granted",
-});
+const prisma = new prismac.PrismaClient()
 
-function getAuthUri() {
-  const token = Fernet.encrypt(JSON.stringify({org_id: "33", user_id: "332"}), "fwHDeF02TCfW8ljjVgLGveSBJT4FhUtrnz7wEn7L_C4=");
-  const authUri = oauthClient.authorizeUri({
-      scope: [OAuthClient.scopes.Accounting, OAuthClient.scopes.OpenId],
-      state: token,
-  
-  });
-  return authUri;
+async function test() {
+  const surveys = await prisma.survey.findMany()
+  surveys.forEach(async (survey) => {
+    //console.log(survey)
+    //console.log(getMonthYear(survey.created_at))
+    await prisma.survey.update({
+      data: {
+        identifier: getMonthYear(survey.created_at)
+      },
+      where: {
+        survey_id: survey.survey_id
+      }
+    })
+  })
+
+  const surveysTeacher = await prisma.survey_teacher.findMany()
+  surveysTeacher.forEach(async (survey) => {
+    //console.log(survey)
+    //console.log(getMonthYear(survey.created_at))
+    await prisma.survey_teacher.update({
+      data: {
+        identifier: getMonthYear(survey.created_at)
+      },
+      where: {
+        survey_teacher_id: survey.survey_teacher_id
+      }
+    })
+  })
 }
 
-console.log(getAuthUri())
+function getMonthYear(datetime) {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const date = new Date(datetime);
+  const month = months[date.getMonth()];
+  const year = date.getFullYear().toString().slice(-2);
+  return `${month} ${year}`;
+}
+
+test()

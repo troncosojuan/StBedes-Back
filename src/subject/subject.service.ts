@@ -17,4 +17,13 @@ export class SubjectService {
       data: createSubjectDto
     });
   }
+
+  async getAllSubjectsStatus() {
+    return this.prismaService.subject.findMany({
+      select: {
+        is_included: true,
+        subject_name: true
+      }
+    });
+  }
 }

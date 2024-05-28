@@ -14,6 +14,7 @@ import { ReportModule } from './report/report.module';
 import { SurveyTeacherModule } from './survey-teacher/survey-teacher.module';
 import { SurveyParentModule } from './survey-parent/survey-parent.module';
 import { AuthModule } from './auth/auth.module';
+import { DriveModule } from './drive/drive.module';
 
 
 
@@ -33,6 +34,7 @@ import { AuthModule } from './auth/auth.module';
     SurveyTeacherModule,
     SurveyParentModule,
     AuthModule,
+    DriveModule,
   ],
   providers: [
     PrismaService,
