@@ -28,7 +28,7 @@ export class SubjectService {
   }
 
   async setAllSubjectsStatus(subjects) {
-    console.log(subjects)
+    subjects = subjects.data;
     for(let i = 0; i < subjects.length; i++){
       const subjectDB = await this.prismaService.subject.findFirst({
         where: {
