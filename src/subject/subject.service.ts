@@ -26,4 +26,25 @@ export class SubjectService {
       }
     });
   }
+
+  async setAllSubjectsStatus(subjects) {
+    for(let i = 0; i < subjects.length; i++){
+      const subjectDB = await this.prismaService.subject.findFirst({
+        where: {
+          subject_name: subjects[i][0]
+        },
+      })
+      if(subjectDB){
+        const response = await this.prismaService.subject.update({
+          where: {
+            subject_id: subjectDB.subject_id 
+          },
+          data: {
+            is_included: subjects[i][1]
+          }
+        })
+      }
+     
+    }
+  }
 }

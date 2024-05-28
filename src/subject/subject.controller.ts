@@ -26,4 +26,11 @@ export class SubjectController {
     async getAllSubjectsStatus() {
         return await this.subjectService.getAllSubjectsStatus();
     }
+
+    @Post('set/status')
+    @ApiResponse({ status: 201, description: "Subjects setted successfully" })
+    async setAllSubjectsStatus(@Body() subjects) {
+        return await this.subjectService.setAllSubjectsStatus(subjects);
+    }
+    
 }
