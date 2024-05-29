@@ -1,4 +1,4 @@
-import { Body, Controller, Get } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 import { SurveyStateService } from './survey_state.service';
 @Controller('survey-state')
@@ -11,7 +11,7 @@ export class SurveyStateController {
         return await this.surveyStateService.get()
     }
 
-    @Get('all/status')
+    @Post('set')
     @ApiResponse({ status: 201, description: "Subjects retrieved successfully" })
     async setAllSubjectsStatus(@Body() body) {
         return await this.surveyStateService.set(body)
