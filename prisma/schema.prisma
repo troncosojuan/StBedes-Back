@@ -167,15 +167,15 @@ model student_by_year {
 }
 
 model subject {
-  subject_id           Int        @id
+  subject_id           Int                     @id
   subject_name         String?
   is_included          Boolean?
   department_id        Int
   last_update_api_date String?
-  created_at           DateTime?  @default(now()) @db.Timestamptz(6)
-  set                  set[]
+  created_at           DateTime?               @default(now()) @db.Timestamptz(6)
   reports              report_subject_emited[]
-  department           department @relation(fields: [department_id], references: [department_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_subject_department")
+  set                  set[]
+  department           department              @relation(fields: [department_id], references: [department_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_subject_department")
 }
 
 model department {
@@ -187,7 +187,7 @@ model department {
 }
 
 model teacher {
-  staff_id             Int              @id
+  staff_id             Int                     @id
   person_id            Int?
   title                String?
   forename             String?
@@ -198,11 +198,10 @@ model teacher {
   full_name            String?
   gender               String?
   school_email_address String?
-  created_at           DateTime?        @default(now()) @db.Timestamptz(6)
+  created_at           DateTime?               @default(now()) @db.Timestamptz(6)
+  reports              report_teacher_emited[]
   survey_teacher       survey_teacher[]
   teacher_by_set       teacher_by_set[]
-  reports              report_teacher_emited[]
-
 }
 
 model teacher_by_set {
@@ -349,28 +348,33 @@ model student_has_survey {
   survey      survey    @relation(fields: [survey_id], references: [survey_id], onDelete: NoAction, onUpdate: NoAction, map: "survey_by_student_survey_fk")
 }
 
-
 model survey_group {
-  id          Int        @id @default(autoincrement())
-  name        String
+  id                Int                     @id @default(autoincrement())
+  name              String
   subject_folder_id String?
   teacher_folder_id String?
-  subject_reports     report_subject_emited[]
-  teacher_reports     report_teacher_emited[]
+  subject_reports   report_subject_emited[]
+  teacher_reports   report_teacher_emited[]
 }
 
 model report_subject_emited {
-  id              Int           @id @default(autoincrement())
+  id              Int          @id @default(autoincrement())
   survey_group_id Int
-  survey_group    survey_group  @relation(fields: [survey_group_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "survey_group_report_fk")
   subject_id      Int
-  subject         subject       @relation(fields: [subject_id], references: [subject_id], onDelete: NoAction, onUpdate: NoAction, map: "subject_report_fk")
+  subject         subject      @relation(fields: [subject_id], references: [subject_id], onDelete: NoAction, onUpdate: NoAction, map: "subject_report_fk")
+  survey_group    survey_group @relation(fields: [survey_group_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "survey_group_report_fk")
 }
 
 model report_teacher_emited {
-  id              Int           @id @default(autoincrement())
+  id              Int          @id @default(autoincrement())
   survey_group_id Int
-  survey_group    survey_group  @relation(fields: [survey_group_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "survey_teacher_group_report_fk")
   teacher_id      Int
-  teacher         teacher       @relation(fields: [teacher_id], references: [staff_id], onDelete: NoAction, onUpdate: NoAction, map: "teacher_report_fk")
+  survey_group    survey_group @relation(fields: [survey_group_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "survey_teacher_group_report_fk")
+  teacher         teacher      @relation(fields: [teacher_id], references: [staff_id], onDelete: NoAction, onUpdate: NoAction, map: "teacher_report_fk")
+}
+
+model survey_state {
+  id    Int     @id @default(autoincrement())
+  name  String
+  state Boolean
 }

@@ -331,7 +331,7 @@ export class ReportService {
       const tableWholeCollage = {
         title: "Whole College Responses",
         subtitle: "A breakdown of student responses per year group",
-        headers: ['Year Group', 'Student Surveyed', 'Answer', 'Question 1', 'Question 2', 'Question 3', 'Question 4', 'Question 5'],
+        headers: ['Year Group', 'Student Surveyed', 'Answer', 'Progress', 'Homework', 'Feedback', 'Support', 'Love of Learning'],
         rows: rows
       };
 
@@ -367,7 +367,7 @@ export class ReportService {
         const table = {
           title: `${subject} Responses`,
           subtitle: "A breakdown of student responses per year group",
-          headers: ['Year Group', 'Student Surveyed', 'Answer', 'Question 1', 'Question 2', 'Question 3', 'Question 4', 'Question 5'],
+          headers: ['Year Group', 'Student Surveyed', 'Answer', 'Progress', 'Homework', 'Feedback', 'Support', 'Love of Learning'],
           rows: rows
         };
 
@@ -433,7 +433,7 @@ for (const teacherName in teacherReportWithTeacherResponses) {
 
     const table = {
       title: `${teacherData.teacherName} - ${subject}`,
-      headers: ['Year Group', 'Student Surveyed', 'Answer', 'Question 1', 'Question 2', 'Question 3', 'Question 4', 'Question 5'],
+      headers: ['Year Group', 'Student Surveyed', 'Answer', 'Progress', 'Homework', 'Feedback', 'Support', 'Love of Learning'],
       rows: rows
     };
 
@@ -616,7 +616,7 @@ for (const teacherName in teacherReportWithTeacherResponses) {
       const tableWholeCollage = {
         title: "Whole College Responses",
         subtitle: "A breakdown of student responses per year group",
-        headers: ['Year Group', 'Student Surveyed', 'Answer', 'Question 1', 'Question 2', 'Question 3', 'Question 4', 'Question 5'],
+        headers: ['Year Group', 'Student Surveyed', 'Answer', 'Progress', 'Homework', 'Feedback', 'Support', 'Love of Learning'],
         rows: rows
       };
 
@@ -656,7 +656,7 @@ for (const teacherName in teacherReportWithTeacherResponses) {
       const table = {
         title: `${subjectName} Responses`,
         subtitle: "A breakdown of student responses per year group",
-        headers: ['Year Group', 'Student Surveyed', 'Answer', 'Question 1', 'Question 2', 'Question 3', 'Question 4', 'Question 5'],
+        headers: ['Year Group', 'Student Surveyed', 'Answer', 'Progress', 'Homework', 'Feedback', 'Support', 'Love of Learning'],
         rows: rowsSubject
       };
 
@@ -734,7 +734,7 @@ for (const teacherName in teacherReportWithTeacherResponses) {
 
         const table = {
           title: `${teacherName}`,
-          headers: ['Set Code', 'Student Surveyed', 'Answer', 'Question 1', 'Question 2', 'Question 3', 'Question 4', 'Question 5'],
+          headers: ['Set Code', 'Student Surveyed', 'Answer', 'Progress', 'Homework', 'Feedback', 'Support', 'Love of Learning'],
           rows: rows,
           autoPageBreak: true,
           prepareRow: (row, indexColumn, indexRow, rectRow) => {
