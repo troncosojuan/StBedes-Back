@@ -647,16 +647,10 @@ export class ReportService {
             totalAgreeAndNotSureRow.push(`${question.agreeAndNotSurePercentage}%`);
           });
 
-          console.log('totalAgreeRow:', totalAgreeRow);
-          console.log('totalAgreeAndNotSureRow:', totalAgreeAndNotSureRow);
-
           rowsSubject.push(totalAgreeRow);
           rowsSubject.push(totalAgreeAndNotSureRow);
         }
       }
-
-      // Verifica que rowsSubject no esté vacío y que contenga datos correctos
-      console.log('rowsSubject:', rowsSubject);
 
       // Definir la tabla para cada materia
       const table = {
