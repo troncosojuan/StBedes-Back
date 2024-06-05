@@ -17,6 +17,45 @@ export class LoginUserDto{
     password: string;
 }
 
+export class ParentDto{
+    @ApiProperty()
+    @IsString()
+    title: string;
+    @ApiProperty()
+    @IsString()
+    forename: string;
+    @ApiProperty()
+    @IsString()
+    surname: string;
+    @ApiProperty()
+    @IsString()
+    relationship_raw: string;
+    @ApiProperty()
+    @IsString()
+    parental_responsibility: string;
+    @ApiProperty()
+    @IsString()
+    parental_responsibility_contact_type: string;
+    @ApiProperty()
+    @IsString()
+    last_update_api_date: string;
+    @ApiProperty()
+    @IsString()
+    is_first_person_contact: string;
+    @ApiProperty()
+    @IsString()
+    contact_id: string;
+    @ApiProperty()
+    @IsString()
+    telephone: string;
+    @ApiProperty()
+    @IsString()
+    email_address: string;
+    @ApiProperty()
+    @IsString()
+    pupil_status: string;
+}
+
 export class StudentDto{
     @ApiProperty()
     @IsString()

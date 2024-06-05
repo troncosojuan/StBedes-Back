@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { userInfo } from 'os';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { LoginUserDto, LoginUserStudentDto, StudentDto } from './dto/user.dto';
+import { LoginUserDto, LoginUserStudentDto, ParentDto, StudentDto } from './dto/user.dto';
 import { plainToClass } from 'class-transformer';
 
 @Injectable()
@@ -37,6 +37,10 @@ export class AuthService {
         if (!user) {
             throw new NotFoundException('Parent not found');
         }
+
+        const userDto = plainToClass(StudentDto, user);
+        
+        return userDto;
     }
 
 
@@ -52,7 +56,7 @@ export class AuthService {
             throw new NotFoundException('Student not found');
         }
 
-        const userDto = plainToClass(StudentDto, user);
+        const userDto = plainToClass(ParentDto, user);
         
         return userDto;
     }
