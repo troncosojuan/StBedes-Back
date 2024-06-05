@@ -54,6 +54,8 @@ export class ParentDto{
     @ApiProperty()
     @IsString()
     pupil_status: string;
+    @Exclude()
+    password: string;
 }
 
 export class StudentDto{
