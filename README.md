@@ -20,11 +20,16 @@ This project is a comprehensive server-side application developed primarily by m
 
 Key Features
 User Management: Efficient handling of user data, authentication, and authorization.
+
 Data Handling: Seamless management and processing of various data sets.
+
 Report Generation: Automated generation of detailed reports based on user data and activities.
+
 Scalability: Designed to handle increasing loads with ease.
+
 Security: Implements best practices for securing user data and API endpoints.
 Installation
+
 To get started, clone the repository and install the dependencies:
 
 bash
@@ -35,10 +40,6 @@ Run the app in different modes:
 # development
 $ npm run start
 
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
 
 
 Contributions
