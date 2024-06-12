@@ -28,42 +28,24 @@ Installation
 To get started, clone the repository and install the dependencies:
 
 bash
-Copiar código
 $ npm install
 Running the App
 Run the app in different modes:
 
-bash
-Copiar código
 # development
 $ npm run start
 
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-Testing
-Execute various tests to ensure code quality and functionality:
-
-bash
-Copiar código
-# unit tests
 $ npm run test
 
 # e2e tests
 $ npm run test:e2e
 
-# test coverage
-$ npm run test:cov
-Deployment
-Guidelines for deploying the application to various environments will be added soon.
 
 Contributions
 This project was primarily developed by me, demonstrating my proficiency in backend development using NestJS. Contributions are welcome, and any enhancements or bug fixes can be submitted via pull requests.
 
 Contact
-For any questions or support, please reach out via my email.
+For any questions or support, please reach out via [my email](mailto:troncosojuanbernabe@gmail.com).
 
 License
 This project is MIT licensed.
